@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+data/iteration_*
+*.R
+data/*
+ipmu/

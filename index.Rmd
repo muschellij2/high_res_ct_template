@@ -8,7 +8,7 @@ address:
   - code: JHSPH
     address: Johns Hopkins Bloomberg School of Public Health, Department of Biostatistics, 615 N Wolfe St, Baltimore, MD, 21205
 abstract: |
-  Clinical imaging relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Many research applications aim to perform population-level analyses, which require images to be put in the same space, usually defined by a population average, also known as a template.  We present an open-source, publicly available, high-resolution CT template.  The template was created using an unbiased template creation procedure, but is still limited by the population it was derived from, an open CT data set without demographic information. We provide a basic segmentation of the cerebrospinal fluid (CSF) spaces of the image, including the ventricles. This template can be used for spatial normalization of CT scans and research applications, including deep learning.
+  Clinical imaging relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Many research applications aim to perform population-level analyses, which require images to be put in the same space, usually defined by a population average, also known as a template.  We present an open-source, publicly available, high-resolution CT template. With this template, we provide voxel-wise standard deviation and median images, a basic segmentation of the cerebrospinal fluid (CSF) spaces, including the ventricles, and a coarse whole brain labeling. This template can be used for spatial normalization of CT scans and research applications, including deep learning. The template was created using an anatomically-unbiased template creation procedure, but is still limited by the population it was derived from, an open CT data set without demographic information. The template and derived imaes are available at XXX.
 journal: "NeuroImage"
 date: "`r Sys.Date()`"
 bibliography: refs.bib
@@ -43,6 +43,7 @@ We have used these templates in previous analyses, but would like a brain templa
 
 ## Methods
 
+All code, analysis, and reporting was done the R statistical programming language [@RCORE] and a number of packages from the R medical imaging package platform Neuroconductor [@neuroconductor].  
 ```{r}
 hres = readr::read_rds("data/high_resolution_scans.rds")
 both = readr::read_rds("data/both_resolution_scans.rds")
@@ -62,11 +63,11 @@ n_both = length(unique(both$id))
 
 We defined a high-resolution scan as having a within-axial resolution of $0.7$x$0.7$mm or less, with full coverage of the brain.  All scans were non-contrast CT scans with a soft-tissue convolution kernel.  
 
-All data was converted from DICOM files to NIfTI (Neuroimaging Informatics Technology Initiative) using `dcm2niix`
+All data was converted from DICOM files to NIfTI (Neuroimaging Informatics Technology Initiative) using `dcm2niix` [@dcm2niix] using the `dcm2niir` package [@dcm2niir].  
 
 From the CQ500 data set, `r n_no_path` subjects had no indication of pathology, of which `r n_template` had a high-resolution scan (if multiple were present, the one with the highest was present).  From these `r n_template` people, `r n_both` had thick-slice scanns where the out-of-plane resolution was greater than $4$mm. 
 
-We chose an image (patient CQ500CT100 from CQ500) with a resolution of $0.488$x$0.488$x$0.5$mm.  The head was skull-stripped so that only brain tissue and CSF spaces were kept.  The image was resampled to $0.5$mm$^3$ resolution so that the voxels are isotropic and high resolution.  As most head CT have a within-axial dimension of 512x512, we padded the image back to 512x512, and the image had 336 coronal-plane slices.  This image was used for template creation.  After the template was created, we padded the coronal plane so that the template was 512x512x512.  The intention is that these dimensions allow it easier to create sub-sampled arrays that are cubes and multiples of 8, such as 256x256x256 or 64x64x64 with isotropic resolution.  These mutliples are particularly important in certain deep learning architectures and frameworks.  Thus, we believee these dimensions allow researchers to transform the head images into a standard, isotropic space that is conducive to deep learning.
+We chose an image (patient 100 from CQ500) with a resolution of $0.488$x$0.488$x$0.5$mm.  The head was skull-stripped so that only brain tissue and CSF spaces were kept.  The image was resampled to $0.5$mm$^3$ resolution so that the voxels are isotropic and high resolution.  As most head CT have a within-axial dimension of 512x512, we padded the image back to 512x512, and the image had 336 coronal-plane slices.  This image was used for template creation.  After the template was created, we padded the coronal plane so that the template was 512x512x512.  The intention is that these dimensions allow it easier to create sub-sampled arrays that are cubes and multiples of 8, such as 256x256x256 or 64x64x64 with isotropic resolution.  These mutliples are particularly important in certain deep learning architectures and frameworks.  Thus, we believee these dimensions allow researchers to transform the head images into a standard, isotropic space that is conducive to deep learning.
 
 The main downside with the CQ500 data set is that no demographic or clinical information was given for each patient, save for indication for pathology.  Therefore, we cannot attest the general population of interest for this template.  In future work, we will prepare age-specific templates for each population based on hospital scans and records.  One of the 
 This work aims to produce a high-resolution, publicly-available template that was based on publicly-available data.  
