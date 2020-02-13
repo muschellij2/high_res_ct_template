@@ -13,6 +13,8 @@ journal: "NeuroImage"
 date: "`r Sys.Date()`"
 bibliography: refs.bib
 output: 
+  html_document: 
+    toc: true
   bookdown::pdf_book:
     base_format: rticles::elsevier_article
     keep_tex: true
@@ -36,16 +38,18 @@ library(ggplot2)
 
 Many research applications of neuroimaging use magnetic resonance imaging (MRI).  MRI allows researchers to study a multitude of applications and diseases, including studying healthy volunteers as it poses minimal risk.  Clinical imaging, however, relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Studies using CT scans cannot generally recruit healthy volunteers or large non-clinical populations due to the radiation exposure and lack of substantial benefit.  As such, much of head CT data is gathered from prospective clinical trials or retrospective studies based on health medical record data and hospital picture archiving and communication system (PACS).  Most of this research is on patients with neuropathology, which can cause deformations of the brain, such as mass effects, lesion, stroke, or tumors.
 
-Many clinical protocols perform axial scanning with a high within-plane resolution (e.g.$0.5$mm x $0.5$mm) but lower out-of-plane resolution (e.g. $5$mm).  High resolution scans (out of plane resolution $\approx 0.5$mm) may not be collected or reconstructed as the lower resolution scans are typically those read by the clinician or radiologist for diagnosis and prognosis. Recently, a resource of a large number of CT scans were made avaiable, denoted as CQ500 [@cq500].  These scans include people with a number of pathologies, including hemorrhagic stroke and midline shifts. Fortunately, this data also includes people **without indicated pathology** with high resolution scanning.  
+Many clinical protocols perform axial scanning with a high within-plane resolution (e.g.$0.5$mm x $0.5$mm) but lower out-of-plane resolution (e.g. $5$mm).  High resolution scans (out of plane resolution $\approx 0.5$mm) may not be collected or reconstructed as the lower resolution scans are typically those read by the clinician or radiologist for diagnosis and prognosis. Recently, a resource of a large number of CT scans were made avaiable, denoted as CQ500 [@cq500].  These scans include people with a number of pathologies, including hemorrhagic stroke and midline shifts. Fortunately, this data also includes people **without indicated pathology** with high resolution scanning, which is what we will use in this study.  
 
-The goal of this work is to create an anatomically unbiased, high-resolution CT template of the brain.  The first, and we believe the only, publicly-available CT template was released by @rorden_age-specific_2012.  This template was created with the specific purpose of creating a template with a similar age range as those with stroke, using 30 individuals with a mean age of 65 years old.  The associated toolbox released contained a high resolution (1x1x1mm$^3$) template, with the skull on.  Subsequent releases have included skull-stripped brain templates, but only in a lower (2x2x2mm$^3$) space (https://github.com/neurolabusc/Clinical).  Thus, we have a high-resolution template, but not of the brain only (and skull stripping the template performs marginally well), and a low-resolution template of the brain only.
-We have used these templates in previous analyses, but would like a brain template that was 1) constructed using an unbiased anatomical procedure, 2) uses more patients, 3) uses high-resolution scans to achieve a higher resolution, and 4) provide an image which dimensions are easily used in deep learning frameworks.
+The goal of this work is to create an anatomically unbiased, high-resolution CT template of the brain.  That is, we wish to create a template that represents the population, regardless of any initial templates we start with.  The first, and we believe the only, publicly-available CT template was released by @rorden_age-specific_2012 (https://www.nitrc.org/projects/clinicaltbx/).  This template was created with the specific purpose of creating a template with a similar age range as those with stroke, using 30 individuals with a mean age of 65 years old (17 men).  The associated toolbox released contained a high resolution (1x1x1mm) template, with the skull on, in Montreal Neurological Institute (MNI) space.  Subsequent releases have included skull-stripped brain templates, but only in a lower (2x2x2mm) space (https://github.com/neurolabusc/Clinical).  
 
-Also, as the CQ500 data was released under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 (CC-NC-SA) International License, we can release the template under the same license.
+Thus, the current CT template available are a high-resolution template (1mm$^3$), but not of the brain only (and skull stripping the template performs marginally well), and a low-resolution template of the brain only, both in MNI space.  We have used these templates in previous analyses, but would like a brain template that was 1) constructed using an unbiased anatomical procedure, 2) uses more patients, 3) uses high-resolution scans to achieve a higher resolution, and 4) provide an image which dimensions are easily used in deep learning frameworks.
+
+As the CQ500 data was released under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 (CC-NC-SA) International License, we can release the template under the same license.
 
 ## Methods
 
 All code, analysis, and reporting was done the R statistical programming language [@RCORE] and a number of packages from the R medical imaging package platform Neuroconductor [@neuroconductor].  
+
 ```{r}
 hres = readr::read_rds("high_resolution_scans.rds")
 both = readr::read_rds("both_resolution_scans.rds")
@@ -63,15 +67,18 @@ n_both = length(unique(both$id))
 
 ### Data
 
-We defined a high-resolution scan as having a within-axial resolution of $0.7$x$0.7$mm or less, with full coverage of the brain.  All scans were non-contrast CT scans with a soft-tissue convolution kernel.  
+We defined a high-resolution patient scan as having a within-axial resolution of $0.7$x$0.7$mm or less, with full coverage of the brain.  For example, if the cerebellum was not imaged, that image was discared.  All scans were non-contrast CT scans with a soft-tissue convolution kernel.  
 
-All data was converted from DICOM files to NIfTI (Neuroimaging Informatics Technology Initiative) using `dcm2niix` [@dcm2niix] using the `dcm2niir` package [@dcm2niir].  
+All data was converted from DICOM files to NIfTI (Neuroimaging Informatics Technology Initiative) using `dcm2niix` [@dcm2niix] using the `dcm2niir` package [@dcm2niir].  This conversion corrects for any gantry tilt and enforces one fixed voxel size for the image, which is necessary if different areas of the image are provided at different resolutions, which is sparsely seen in clinical CT images.
 
-From the CQ500 data set, `r n_no_path` subjects had no indication of pathology, of which `r n_template` had a high-resolution scan (if multiple were present, the one with the highest was present).  From these `r n_template` people, `r n_both` had thick-slice scanns where the out-of-plane resolution was greater than $4$mm. 
+From the CQ500 data set, `r n_no_path` subjects had no indication of pathology, of which `r n_template` had a high-resolution scan (if multiple were present, the one with the highest resolution was used).  From these `r n_template` people, `r n_both` had "thick-slice" scans where the out-of-plane resolution was greater than $4$mm.  We used these `r n_both` scans for construction of the template.  The `r n_template-n_both` scans were discarded as we wish to perform the same operation using low-resolutions scans to see the effect of initial resolution on template creation, but that is not the focus of this work.
 
-We chose an image (patient 100 from CQ500) with a resolution of $0.488$x$0.488$x$0.5$mm.  The head was skull-stripped so that only brain tissue and CSF spaces were kept.  The image was resampled to $0.5$mm$^3$ resolution so that the voxels are isotropic and high resolution.  As most head CT have a within-axial dimension of 512x512, we padded the image back to 512x512, and the image had 336 coronal-plane slices.  This image was used for template creation.  After the template was created, we padded the coronal plane so that the template was 512x512x512.  The intention is that these dimensions allow it easier to create sub-sampled arrays that are cubes and multiples of 8, such as 256x256x256 or 64x64x64 with isotropic resolution.  These mutliples are particularly important in certain deep learning architectures and frameworks.  Thus, we believee these dimensions allow researchers to transform the head images into a standard, isotropic space that is conducive to deep learning.
+We chose an image (patient 100 from CQ500) with a resolution of $0.488$x$0.488$x$0.5$mm.  The head was skull-stripped so that only brain tissue and CSF spaces were kept, using a previously validated method [@muschelli_validated_2015] using the brain extraction tool (BET) from FSL (FMRIB Software Library
+) [@smith_fast_2002; @jenkinson_fsl_2012].  The image was resampled to $0.5$x$0.5$x$0.5$mm resolution so that the voxels are isotropic.  As most head CT have a within-axial dimension of 512x512 and we would like the image to be square, we padded the image back to 512x512 after resampling, and the image had 336 coronal-plane slices.  This image was used for template creation.  
 
-The main downside with the CQ500 data set is that no demographic or clinical information was given for each patient, save for indication for pathology.  Therefore, we cannot attest the general population of interest for this template.  In future work, we will prepare age-specific templates for each population based on hospital scans and records.  One of the 
+
+The main downside with the CQ500 data set is that no demographic or clinical information was released for each patient, save for indication for pathology.  Therefore, we cannot attest the general population of interest for this template.  Furthermore, we cannot fully assume these patients were disease-free as a lack of pathology only applies to the categories of interest in the CQ500 dataset (intracranial/subdural/subarachnoic/epidural hematoma, Calvarial or other fractures, mass effect and midline shifts).  
+In future work, we will prepare age-specific templates for each population based on hospital scans and records.  One of the 
 This work aims to produce a high-resolution, publicly-available template that was based on publicly-available data.  
 
 ### Template Creation
@@ -103,6 +110,9 @@ stopifnot(which.max(dmss$dice) == which.min(dmss$rmse_masked))
 To define convergence, we would like a high DSC between the masks and a low RMSE.  Ideally, the convergence criteria would set a DSC of $1$ and a RMSE less than $1$HU, which would indicate the voxel intensity is changing less than $1$HU on average.  As CT scans are measured in integers, this RMSE would likely be as good as possible.  We set a DSC cutoff of $0.95$ and chose the template with the lowest RMSE.  As this procedure is computationally expensive, we ran $`r run_ind`$ iterations, which was adequate for achieving stable results (Figure \@ref(fig:performance)).  
 
 Values of the final template that were lower than $5$HU were boundary regions, outside the region of the brain and likely due to singlular segmentation images, incongruent with the remainder of the image.  We did not contrain the DSC and RMSE calculation excluding these regions, but excluded them from the final template.
+
+
+After the template was created, we padded the coronal plane so that the template was 512x512x512.  The intention is that these dimensions allow it easier to create sub-sampled arrays that are cubes and multiples of 8, such as 256x256x256 or 64x64x64 with isotropic resolution.  These mutliples are particularly important in certain deep learning architectures and frameworks.  Thus, we believe these dimensions allow researchers to transform the head images into a standard, isotropic space that is conducive to deep learning.
 
 ### Segmentation
 
