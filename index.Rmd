@@ -186,7 +186,7 @@ mask_sd = sd_img[mask == 1]
 sd_img = sd_img * mask
 ```
 
-```{r, echo = FALSE, message = FALSE, results ="hide"}
+```{r make_pngs, echo = FALSE, message = FALSE, results ="hide"}
 pngname = file.path("index_files", "figure-latex", "template.png")
 png(pngname, height = 7, width = 7, units = "in", res = 600)
 ortho2(img, text = "(A)\nTemplate")
@@ -215,15 +215,10 @@ vals = img[mask == 1]
 pngname = file.path("index_files", "figure-latex", "template_hist.png")
 png(pngname, height = 7, width = 7, units = "in", res = 600)
 hist(vals, breaks = 100)
-text(x = 65, y = 1e5, text = "C", cex = 2)
+text(x = 70, y = 2e5, labels = "C", cex = 2)
 dev.off()
 hist_pngname = pngname
 
-pngname = file.path("index_files", "figure-latex", "template_sd.png")
-png(pngname, height = 7, width = 7, units = "in", res = 600)
-ortho2(window_img(sd_img))
-dev.off()
-sd_pngname = pngname
 ```
 
 ```{r template, message=FALSE, fig.cap="Template Image, Standard Deviation Image, and Histogram of Intensities.  Here we show the template in the left panel, the voxel-wise standard deviation, denoting areas of variability (which include biological and technical variability), and the histogram of the template intensities/Hounsfield Units (HU).  Overall the template is smooth and values fall in the range of 5 to 65 HU.", results = "markup"}

@@ -159,8 +159,6 @@ Separating the brain from the cerebrospinal fluid areas (mainly ventricles) are 
 
 As we see in Figure \ref{fig:performance}A, the DSC quickly increases and reaches a high score, where the horizontal line indicates a DSC of \(0.99\). The red dot and vertical line indicate the iteration that had the maximum DSC (0.9896). As the DSC is high for all iterations past iteration \(15\), we chose the template based on the minimum RSE. In Figure \ref{fig:performance}B, we see a similar pattern of improving performance, but by lowering the RMSE. The lowest RMSE is noted by the red point with a value of \(1.47\). Thus, this iteration (iteration \(37\)) is the template we will choose.
 
-The template for this image can be seen in Figure \ref{fig:template}, along with the standard deviation image, and a histogram of the intensities of the template. We see the template is relatively smooth, with values from 5 HU to around 65 HU. The standard deviation image shows high variability around the lateral horns, which may be due to calcifications in a set of patients, which have abnormally high HU values.
-
 \begin{figure}
 \centering
 \includegraphics{index_files/figure-latex/performance-1.pdf}
@@ -178,13 +176,15 @@ The template for this image can be seen in Figure \ref{fig:template}, along with
 \caption{\label{fig:template}Template Image, Standard Deviation Image, and Histogram of Intensities. Here we show the template in the left panel, the voxel-wise standard deviation, denoting areas of variability (which include biological and technical variability), and the histogram of the template intensities/Hounsfield Units (HU). Overall the template is smooth and values fall in the range of 5 to 65 HU.}
 \end{figure}
 
+The template for this image can be seen in Figure \ref{fig:template}, along with the standard deviation image, and a histogram of the intensities of the template. We see the template is relatively smooth, with values from 5 HU to around 65 HU. The standard deviation image shows high variability around the lateral horns, which may be due to calcifications in a set of patients, which have abnormally high HU values.
+
 \begin{figure}
 \centering
 \includegraphics{index_files/figure-latex/seg-1.pdf}
-\caption{\label{fig:seg}Template Image, Tissue Segmentation, and Whole Brain Segmentation. We see the areas of white matter, gray matter, cebebrospinal fluid (CSF) in Panel B. We see}
+\caption{\label{fig:seg}Template Image, Tissue Segmentation, and Whole Brain Segmentation. We see the areas of white matter, gray matter, cebebrospinal fluid (CSF) in Panel B. We see the whole brain structural segmentation in Panel C.}
 \end{figure}
 
-See Figure\ref{fig:segmentation}
+In Figure\ref{fig:seg}, we see the template again, with the tissue-class segmentation (Panel B) and teh whole brain structural segmentation (Panel C).
 
 \hypertarget{discussion}{%
 \subsection{Discussion}\label{discussion}}
@@ -195,7 +195,7 @@ In addition to the template, we have provided a set of segmentations. This inclu
 
 The resulting image dimensions was 512x512x512, with a resolution of 0.5x0.5x0.5mm. The fact that the image dimension is a multiple of 8 allows it to be resampled to 1x1x1mm and 2x2x2mm and remain as a cube. These dimensions are particularly important in certain deep learning architectures and frameworks. Though most templates are given using the mean image, we believe the standard deviation image represents variability in the area. This variability represents true systematic and biologic variability. One important area of systemic variability is registration errors. Therefore this template allows for the creation of z-score images, where a new image is registered to the mean image, the mean image is subtracted, and then divided by the standard-deviation image, so that voxels represent standard deviations away from the mean voxel. This image may be a useful tool in feature extraction. Thus, we believe this template provides a standard, isotropic space that is conducive to machine learning and can reduce the burden of standardization for medical imaging applications.
 
-CQ500 is Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. Therefore, the template is released under the same license.
+CQ500 is Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. Therefore, the template is released under the same license. The images are located on https://github.com/muschellij2/high\_res\_ct\_template and can be accessed at https://johnmuschelli.com/high\_res\_ct\_template/template/.
 
 \hypertarget{acknowledgments}{%
 \subsection{Acknowledgments}\label{acknowledgments}}
