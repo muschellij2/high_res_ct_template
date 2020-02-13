@@ -13,13 +13,13 @@ journal: "NeuroImage"
 date: "`r Sys.Date()`"
 bibliography: refs.bib
 output: 
-  html_document: 
-    toc: true
   bookdown::pdf_book:
     base_format: rticles::elsevier_article
     keep_tex: true
     number_sections: yes
     keep_md: true
+  html_document: 
+    toc: true
 ---
 
 ```{r setup, include = FALSE}
@@ -67,7 +67,7 @@ n_both = length(unique(both$id))
 
 ### Data
 
-We defined a high-resolution patient scan as having a within-axial resolution of $0.7$x$0.7$mm or less, with full coverage of the brain.  For example, if the cerebellum was not imaged, that image was discared.  All scans were non-contrast CT scans with a soft-tissue convolution kernel.  
+We defined a high-resolution patient scan as having a within-axial resolution of $0.7$x$0.7$mm or less, with full coverage of the brain.  For example, if the cerebellum was not imaged, that image was discared.  All scans were non-contrast CT scans with a soft-tissue convolution kernel.  As CT scans are generally well calibrated across sites and are measured in standard units of Hounsfield Units (HU), no intensity normalization was done.  Intensities less than $-1024$ HU (the value for air) and greater than $3071$ HU were Winsorized to those values, as values outside of these are likely artifact or areas outside the field of view.  
 
 All data was converted from DICOM files to NIfTI (Neuroimaging Informatics Technology Initiative) using `dcm2niix` [@dcm2niix] using the `dcm2niir` package [@dcm2niir].  This conversion corrects for any gantry tilt and enforces one fixed voxel size for the image, which is necessary if different areas of the image are provided at different resolutions, which is sparsely seen in clinical CT images.
 
@@ -76,21 +76,16 @@ From the CQ500 data set, `r n_no_path` subjects had no indication of pathology, 
 We chose an image (patient 100 from CQ500) with a resolution of $0.488$x$0.488$x$0.5$mm.  The head was skull-stripped so that only brain tissue and CSF spaces were kept, using a previously validated method [@muschelli_validated_2015] using the brain extraction tool (BET) from FSL (FMRIB Software Library
 ) [@smith_fast_2002; @jenkinson_fsl_2012].  The image was resampled to $0.5$x$0.5$x$0.5$mm resolution so that the voxels are isotropic.  As most head CT have a within-axial dimension of 512x512 and we would like the image to be square, we padded the image back to 512x512 after resampling, and the image had 336 coronal-plane slices.  This image was used for template creation.  
 
-
-The main downside with the CQ500 data set is that no demographic or clinical information was released for each patient, save for indication for pathology.  Therefore, we cannot attest the general population of interest for this template.  Furthermore, we cannot fully assume these patients were disease-free as a lack of pathology only applies to the categories of interest in the CQ500 dataset (intracranial/subdural/subarachnoic/epidural hematoma, Calvarial or other fractures, mass effect and midline shifts).  
-In future work, we will prepare age-specific templates for each population based on hospital scans and records.  One of the 
-This work aims to produce a high-resolution, publicly-available template that was based on publicly-available data.  
-
 ### Template Creation
 
-The process of template creation was as follows:
+The process of template creation can be thought of as a gradient descent algorithm to estimate the true template image as inspired by the advanced normalization tools (ANTs) software and the R package ANTsR that implements the registration and transformation was used (https://github.com/ANTsX/ANTsR).  The process is as follows:
 
-1. Register all images to the template $\bar{T}_{k}$ using an affine registration followed by symmetric normalization (SyN), a non-linear deformation [@avants_symmetric_2008].  Let the transformed image be denoted as $T_{i, k}$, where $i$ represents subjects and $k$ represents iteration.  Let the composition of the combined affine and non-linear transformation be denoted $G_{i, k}$.  This transformation is represented by a 4D warping image.  Let $T_{1}$ be the original template chosen above and $G_{i, 1}$ be the transformation for to the original template.
-2.  Calculate a the mean, median, and standard deviation images, where the mean image $\bar{T}_{k} = \frac{1}{n} \sum\limits_{i = 1}^n T_{i, k}$, using a voxel-wise average.  
-3.  Calculate the average warping transformation: $\bar{G}_{k} = \frac{1}{n} \sum\limits_{i = 1}^n G_{i, k}$.  A gradient step of $0.2$ was set, so that 
-$\bar{T}_{k + 1} = \bar{T}_{k} \times \left(-0.2 * \bar{G}_{k}\right)$.  Transform the median and standard-deviation image in the same way.
+1. Let $I_{i}$ represent the image where $i$ represents subjects.  We will Register all images to the template, denoted $\bar{T}_{k}$ where $k$ represents iteration, using an affine registration followed by symmetric normalization (SyN), a non-linear deformation, where the composed transformation is denoted as $G_{i, k}$ [@avants_symmetric_2008].  Let the transformed image be denoted as $T_{i, k}$.  In other words, $I_{i}\overset{G_{i,k}}{\rightarrow}T_{i, k}$.  The transformation $G_{i, k}$ is represented by a 4D warping image.  Let $T_{1}$ be the original template chosen above and $G_{i, 1}$ be the transformation for an image to the original template.
+2.  Calculate a the mean, median, and standard deviation images, where the mean image is $\bar{T}_{k} = \frac{1}{n} \sum\limits_{i = 1}^n T_{i, k}$, using a voxel-wise average.  
+3.  Calculate the average warping transformation: $\bar{G}_{k} = \frac{1}{n} \sum\limits_{i = 1}^n G_{i, k}$.  A gradient descent step size of 0.2 was specified for SyN gradient descent, such that:
+$\bar{T}_{k + 1} = \bar{T}_{k} \times \left(-0.2 * \bar{G}_{k}\right)$.  The median and standard deviation are transformed accordingly.
 
-For each iteration $k$, we can calculate a number of measures to determine if the template has converged compared to the previous iteration $k - 1$.  We calculated the Dice Similarity Coefficient (DSC) between the mask of iteration $k$ and $k-1$, where the mask for iteration $k$ is defined as $\bar{T}_{k} > 0$.  We also the Root Mean Squared Error (RMSE) of voxel intensities.  The RMSE can be calculated over a series of areas, either 1) the entire image, 2) over the non-zero voxels in iteration $k$, 3) in iteration $k-1$, or 4) the union (or intersection) of the 2 masks.  Calculation over the entire image gives an optimistic estimate as most of the image are zeroes, and the choice of either iteration $k$ or $k-1$ masks is arbitrary, so we calculated the RMSE over the union of the 2 masks.  
+For each iteration $k$, we can calculate a number of measures to determine if the template has converged compared to the previous iteration $k - 1$.  We calculated the Dice Similarity Coefficient (DSC) between the mask of iteration $k$ and $k-1$, where the mask for iteration $k$ is defined as $\bar{T}_{k} > 0$.  We also the root Mean mquared error (RMSE) of voxel intensities.  The RMSE can be calculated over a series of areas, either 1) the entire image, 2) over the non-zero voxels in iteration $k$, 3) in iteration $k-1$, or 4) the union (or intersection) of the 2 masks.  Calculation over the entire image gives an optimistic estimate as most of the image are zeroes, and the choice of either iteration $k$ or $k-1$ masks is arbitrary, so we calculated the RMSE over the union of the 2 masks.  
 
 ```{r}
 dnext = readr::read_rds("dice_ss.rds")
@@ -107,18 +102,22 @@ index = dss$ind[which.min(dss$rmse_masked)]
 stopifnot(which.max(dmss$dice) == which.min(dmss$rmse_masked))
 ```
 
-To define convergence, we would like a high DSC between the masks and a low RMSE.  Ideally, the convergence criteria would set a DSC of $1$ and a RMSE less than $1$HU, which would indicate the voxel intensity is changing less than $1$HU on average.  As CT scans are measured in integers, this RMSE would likely be as good as possible.  We set a DSC cutoff of $0.95$ and chose the template with the lowest RMSE.  As this procedure is computationally expensive, we ran $`r run_ind`$ iterations, which was adequate for achieving stable results (Figure \@ref(fig:performance)).  
+To define convergence, we would like a high DSC between the masks and a low RMSE.  Ideally, the convergence criteria would set a DSC of $1$ and a RMSE less than $1$ Hounsfield Unit (HU), which would indicate the voxel intensity is changing less than $1$ HU on average.  As CT scans are measured in integers, this RMSE would likely be as good as possible.  We set a DSC cutoff of $0.95$ and chose the template with the lowest RMSE.  As this procedure is computationally expensive, we ran $`r run_ind`$ iterations, which was adequate for achieving stable results (Figure \@ref(fig:performance)).  
 
-Values of the final template that were lower than $5$HU were boundary regions, outside the region of the brain and likely due to singlular segmentation images, incongruent with the remainder of the image.  We did not contrain the DSC and RMSE calculation excluding these regions, but excluded them from the final template.
+Values of the final template that were lower than $5$ HU were boundary regions, outside the region of the brain and likely due to singlular segmentation images, incongruent with the remainder of the image (Supplemental Figure \@ref(fig:boundary)).  We did not contrain the DSC and RMSE calculation excluding these regions, but excluded values less than $5$ HU from the final template.
 
-
-After the template was created, we padded the coronal plane so that the template was 512x512x512.  The intention is that these dimensions allow it easier to create sub-sampled arrays that are cubes and multiples of 8, such as 256x256x256 or 64x64x64 with isotropic resolution.  These mutliples are particularly important in certain deep learning architectures and frameworks.  Thus, we believe these dimensions allow researchers to transform the head images into a standard, isotropic space that is conducive to deep learning.
+After the template was created, we padded the coronal plane so that the template was 512x512x512.  The intention is that these dimensions allow it easier to create sub-sampled arrays that are cubes and multiples of 8, such as 256x256x256 or 64x64x64 with isotropic resolution.  
 
 ### Segmentation
 
-Though the template itself is the main goal of the work, segmentations of the template are worthwhile in analysis.  In many CT scans, the contrast between gray matter and white matter is not high, except for specific structures such as the cerebellum, corpus callosum, and basal ganglia.  Separating the brain from the cerebrospinal fluid areas (mainly ventricles) are of interest in many applications.  For the final template, we performed a multi-atlas segmentation using a previously published set of 35 MRI atlases [@bennett2012miccai].  We registered each brain MRI with the template using SyN and applied the transformation to the associated tissue segmentation from that template.  Thus, we had 35 tissue segmentations of the CT template in template space, and the segmentations were combined using STAPLE [@warfield2004simultaneous] via the `stapler` package [@stapler].  
+Though the template itself is the main goal of the work, many times researchers use or are interested in annotations or segmentations of the template space.  In many CT scans, the contrast between gray matter and white matter is not high, except for specific structures such as the cerebellum, corpus callosum, and basal ganglia.  Thus, segmentation methods based on intensity may not differentiate gray and white matter adequately.  We used a multi-atlas registration approach.  We used a previously published set of 35 MRI atlases from @bennett2012miccai, which had whole brain segmentations, including tissue-class segmentations.  
 
-Along with tissue-level segmentations, the atlases from @bennett2012miccai contain 200 different structures of the brain.  We have also performed the same operation, but we caution users to how well this template can provide an accurate segmentation of these structures.  At least, the accuracy of the segmentation varies over tissue type, structure volume, and structure location within the brain.   
+We registered each brain MRI with the template using SyN and applied the transformation to the associated tissue segmentation and whole brain segmentation from that template.  Thus, we had 35 tissue segmentations of the CT template in template space, and the segmentations were combined using STAPLE [@warfield2004simultaneous] via the `stapler` package [@stapler].  The whole brain structures were combined using majority vote. 
+
+In addition, we segmented the template using Atropos [@atropos]
+Separating the brain from the cerebrospinal fluid areas (mainly ventricles) are of interest in many applications, such as Alzheimer's disease [@de1989alzheimer; braak1999neuropathology].  
+
+
 
 ## Results
 
@@ -167,6 +166,12 @@ grid.arrange(g, grmse, ncol = 2)
 # sd_fname = sub("average", "sd", fname)
 fname = "template/template.nii.gz"
 sd_fname = "template/template_sd.nii.gz"
+struct_fname = "template/structures.nii.gz"
+seg_fname = "template/seg.nii.gz"
+seg = readNifti(seg_fname)
+struct = readNifti(struct_fname)
+img = readNifti(fname)
+
 img = readNifti(fname)
 rimg = range(img)
 rimg_non_zero = range(img[img != 0])
@@ -174,51 +179,91 @@ mask = img >= 5
 orig_img = img
 stopifnot(rimg[1] >= 0)
 img = img * mask
+seg = seg * mask
+struct = struct*mask
 sd_img = readNifti(sd_fname)
 mask_sd = sd_img[mask == 1]
 sd_img = sd_img * mask
 ```
 
-```{r, eval = FALSE, fig.show="hold"}
+```{r, echo = FALSE, message = FALSE, results ="hide"}
 pngname = file.path("index_files", "figure-latex", "template.png")
-# png(pngname, height = 7, width = 7, units = "in", res = 600)
-ortho2(img)
-# dev.off()
+png(pngname, height = 7, width = 7, units = "in", res = 600)
+ortho2(img, text = "(A)\nTemplate")
+dev.off()
 img_pngname = pngname
-# pngname = file.path("index_files", "figure-latex", "template_sd.png")
-# png(pngname, height = 7, width = 7, units = "in", res = 600)
-ortho2(sd_img)
-# dev.off()
+pngname = file.path("index_files", "figure-latex", "template_sd.png")
+png(pngname, height = 7, width = 7, units = "in", res = 600)
+ortho2(window_img(sd_img), text = "(B)\nSD Image")
+dev.off()
 sd_pngname = pngname
 
+pngname = file.path("index_files", "figure-latex", "template_seg.png")
+png(pngname, height = 7, width = 7, units = "in", res = 600)
+ortho2(seg, text = "(B)\nTissue Segmentation")
+dev.off()
+seg_pngname = pngname
+
+
+pngname = file.path("index_files", "figure-latex", "template_struct.png")
+png(pngname, height = 7, width = 7, units = "in", res = 600)
+ortho2(struct, text = "(C)\nBrain Structures")
+dev.off()
+struct_pngname = pngname
+
 vals = img[mask == 1]
-# pngname = file.path("index_files", "figure-latex", "template_hist.png")
-# png(pngname, height = 7, width = 7, units = "in", res = 600)
-# hist(vals, breaks=100)
-# dev.off()
+pngname = file.path("index_files", "figure-latex", "template_hist.png")
+png(pngname, height = 7, width = 7, units = "in", res = 600)
+hist(vals, breaks = 100)
+text(x = 65, y = 1e5, text = "C", cex = 2)
+dev.off()
 hist_pngname = pngname
+
+pngname = file.path("index_files", "figure-latex", "template_sd.png")
+png(pngname, height = 7, width = 7, units = "in", res = 600)
+ortho2(window_img(sd_img))
+dev.off()
+sd_pngname = pngname
 ```
 
-```{r template, message=FALSE, fig.cap="Convergence of Shape and Intensity of the Template over Iterations.  Here we see the Dice Similarity Coefficient (DSC) increase between an iteration and the previous iteration, achieving high degrees of overlap, indicating the shape of the surface of the image is similar and converging (panel A).  We also see the root mean-squared error (pane) drops as the iterations increase and then levels off around 4 Hounsfield units (HU), the horizontal line. The red dot indicates the iteration chosen for the template.", eval = FALSE}
+```{r template, message=FALSE, fig.cap="Template Image, Standard Deviation Image, and Histogram of Intensities.  Here we show the template in the left panel, the voxel-wise standard deviation, denoting areas of variability (which include biological and technical variability), and the histogram of the template intensities/Hounsfield Units (HU).  Overall the template is smooth and values fall in the range of 5 to 65 HU.", results = "markup"}
 path  = file.path("index_files", "figure-latex", 
                  c("template.png", "template_sd.png",
                    "template_hist.png"))
+grobs = lapply(path, function(x) {
+  rasterGrob(as.raster(readPNG(x)), interpolate = FALSE)
+  })
+grid.arrange(grobs[[1]], grobs[[2]], grobs[[3]], ncol = 3)
 ```
 
-See Figure\@ref(fig:segmentation)
 
+The template for this image can be seen in Figure \@ref(fig:template), along with the standard deviation image, and a histogram of the intensities of the template.  We see the template is relatively smooth, with values from 5 HU to around 65 HU.  The standard deviation image shows high variability around the lateral horns, which may be due to calcifications in a set of patients, which have abnormally high HU values.
+
+
+```{r seg, message=FALSE, fig.cap="Template Image, Tissue Segmentation, and Whole Brain Segmentation.  We see the areas of white matter, gray matter, cebebrospinal fluid (CSF) in Panel B. We see the whole brain structural segmentation in Panel C. ", results = "markup"}
+path  = file.path("index_files", "figure-latex", 
+                 c("template.png", "template_seg.png",
+                   "template_struct.png"))
+grobs = lapply(path, function(x) {
+  rasterGrob(as.raster(readPNG(x)), interpolate = FALSE)
+  })
+grid.arrange(grobs[[1]], grobs[[2]], grobs[[3]], ncol = 3)
+```
+
+In Figure\@ref(fig:seg), we see the template again, with the tissue-class segmentation (Panel B) and teh whole brain structural segmentation (Panel C).  
 
 
 ## Discussion 
 
-We present a high-resolution, publicly available CT template with an associated segmentation of tissues.
+We present a high-resolution, publicly-available CT template with associated segmentations and other annotations of the template. The data used was from a publicly-available dataset, the CQ500.  The main downside with the CQ500 data set is that no demographic or clinical information was released for each patient, save for indication for pathology.  Therefore, we cannot attest the general population of interest for this template.  Furthermore, we cannot fully assume these patients were disease-free as a lack of pathology only applies to the categories of interest in the CQ500 dataset (intracranial/subdural/subarachnoic/epidural hematoma, Calvarial or other fractures, mass effect and midline shifts).   In future work, we hope to prepare age- and sex-specific templates for each population based on hospital scans and records, where we have demographic information and confirmation of lack of neuropathology. 
 
 
-Though most templates are given using the mean image, we believe the standard deviation image represents variability in the area.  This variability represents true systematic and biologic variability.  One important area of systemic variability is registration errors.  Therefore this template allows for the creation of z-score images, where a new image is registered to the mean image, the mean image is subtracted, and then divided by the standard-deviation image, so that voxels represent standard deviations away from the mean voxel.
+In addition to the template, we have provided a set of segmentations.  This includes a whole brain segmentation of over 150 structures. Though this may prove useful, we caution users to how well this template can provide an accurate segmentation of these structures.  At least, the accuracy of the segmentation may have variable accuracy at different areas of the brain.   
+
+The resulting image dimensions was 512x512x512, with a resolution of 0.5x0.5x0.5mm.  The fact that the image dimension is a multiple of 8 allows it to be resampled to 1x1x1mm and 2x2x2mm and remain as a cube.  These dimensions are particularly important in certain deep learning architectures and frameworks.  Though most templates are given using the mean image, we believe the standard deviation image represents variability in the area.  This variability represents true systematic and biologic variability.  One important area of systemic variability is registration errors.  Therefore this template allows for the creation of z-score images, where a new image is registered to the mean image, the mean image is subtracted, and then divided by the standard-deviation image, so that voxels represent standard deviations away from the mean voxel.  This image may be a useful tool in feature extraction. Thus, we believe this template provides a standard, isotropic space that is conducive to machine learning and can reduce the burden of standardization for medical imaging applications.
 
 
-
-CQ500 is Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.  Therefore, the template is released under the same license. 
+CQ500 is Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.  Therefore, the template is released under the same license.  The images are located on https://github.com/muschellij2/high_res_ct_template and can be accessed at https://johnmuschelli.com/high_res_ct_template/template/.
 
 
 ## Acknowledgments
@@ -231,6 +276,10 @@ References {#references .unnumbered}
 
 # Supplemental Material
 
-```{r boundary, fig.cap="Boundary Issues with Low HU Values.  Here we present the average image with the mask of voxels that were lower than 5HU in the template.  We excluded these values from the final template."}
-ortho2(orig_img, orig_img < 5 & orig_img > 0)
+```{r boundary, fig.cap="Boundary Issues with Low HU Values.  Here we present the average image with the mask of voxels that were lower than 5 HU in the template.  We excluded these values from the final template."}
+fname = file.path("data", sub("template_creation/", "", wmin$img))
+img = readnii(fname)
+orig_img = img
+xyz = xyz(array(orig_img > 10, dim = dim(orig_img)))
+ortho2(orig_img, orig_img < 5 & orig_img > 0, xyz = xyz)
 ```

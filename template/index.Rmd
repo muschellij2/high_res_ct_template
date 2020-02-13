@@ -1,0 +1,28 @@
+---
+title: "High Resolution CT data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Files
+
+
+```{r, echo = FALSE, warning=FALSE, message = FALSE}
+library(magrittr)
+x = list.files(pattern = "nii.gz")
+y = c("lateral_ventricles" = "Lateral Ventricles", "seg" = "Tissue Segmentation", "structures" = "Brain Structures", "template_median" = "Voxel-wise Median", 
+"template_sd" = "Voxel-wise Standard Deviation", "Template_to_MNIcomptx" = "SyN Transform to MNI space", "template" = "Template Image")
+y = data.frame(name = y, stub = names(y), stringsAsFactors = FALSE)
+df = data.frame(
+  link = paste0("[", x, "](", x, ")"),
+  stub = neurobase::nii.stub(x, bn = TRUE),
+  stringsAsFactors = FALSE)
+df = merge(df, y)
+df$stub = NULL
+df %>% 
+  knitr::kable(escape = FALSE) %>% 
+  kableExtra::kable_styling()
+```
