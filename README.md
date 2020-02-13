@@ -17,3 +17,5 @@ a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0
 International
 License](http://creativecommons.org/licenses/by-nc-sa/4.0/), and thus so
 is this template.
+
+See the files in the [template folder](template/).
