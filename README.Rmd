@@ -21,6 +21,6 @@ knitr::opts_chunk$set(
 The data used for this template was from the CQ500 dataset by qure.ai (http://headctstudy.qure.ai/dataset).  That data set is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/), and thus so is this template. 
 
 
-See the files in the [template folder](template/).
+See the files in the [template folder](template/) or [here](https://johnmuschelli.com/high_res_ct_template/template).
 
 

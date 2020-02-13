@@ -18,4 +18,5 @@ International
 License](http://creativecommons.org/licenses/by-nc-sa/4.0/), and thus so
 is this template.
 
-See the files in the [template folder](template/).
+See the files in the [template folder](template/) or
+[here](https://johnmuschelli.com/high_res_ct_template/template).
