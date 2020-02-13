@@ -8,7 +8,7 @@ address:
   - code: JHSPH
     address: Johns Hopkins Bloomberg School of Public Health, Department of Biostatistics, 615 N Wolfe St, Baltimore, MD, 21205
 abstract: |
-  Clinical imaging relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Many research applications aim to perform population-level analyses, which require images to be put in the same space, usually defined by a population average, also known as a template.  We present an open-source, publicly available, high-resolution CT template. With this template, we provide voxel-wise standard deviation and median images, a basic segmentation of the cerebrospinal fluid (CSF) spaces, including the ventricles, and a coarse whole brain labeling. This template can be used for spatial normalization of CT scans and research applications, including deep learning. The template was created using an anatomically-unbiased template creation procedure, but is still limited by the population it was derived from, an open CT data set without demographic information. The template and derived imaes are available at XXX.
+  Clinical imaging relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Many research applications aim to perform population-level analyses, which require images to be put in the same space, usually defined by a population average, also known as a template.  We present an open-source, publicly available, high-resolution CT template. With this template, we provide voxel-wise standard deviation and median images, a basic segmentation of the cerebrospinal fluid spaces, including the ventricles, and a coarse whole brain labeling. This template can be used for spatial normalization of CT scans and research applications, including deep learning. The template was created using an anatomically-unbiased template creation procedure, but is still limited by the population it was derived from, an open CT data set without demographic information. The template and derived imaes are available at https://github.com/muschellij2/high_res_ct_template. 
 journal: "NeuroImage"
 date: "`r Sys.Date()`"
 bibliography: refs.bib
@@ -34,20 +34,22 @@ library(ggplot2)
 
 # Introduction
 
-Many research applications of neuroimaging use magnetic resonance imaging (MRI).  MRI allows researchers to study a multitude of applications and diseases, including studying healthy volunteers.  Clinical imaging, however, relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Studies using CT scans cannot generally recruit healthy volunteers or large non-clinical populations due to the radiation exposure and lack of substantial benefit.  As such, much of head CT data is gathered from prospective clinical trials or retrospective studies based on health medical record data and hospital picture archiving and communication system (PACS).  Most of this research is on patients with neuropathology, which can cause deformations of the brain, such as mass effects.  
+Many research applications of neuroimaging use magnetic resonance imaging (MRI).  MRI allows researchers to study a multitude of applications and diseases, including studying healthy volunteers as it poses minimal risk.  Clinical imaging, however, relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Studies using CT scans cannot generally recruit healthy volunteers or large non-clinical populations due to the radiation exposure and lack of substantial benefit.  As such, much of head CT data is gathered from prospective clinical trials or retrospective studies based on health medical record data and hospital picture archiving and communication system (PACS).  Most of this research is on patients with neuropathology, which can cause deformations of the brain, such as mass effects, lesion, stroke, or tumors.
 
-Recently, a resource of a large number of CT scans were made avaiable [@cq500].  These scans include people with a number of pathologies, including hemorrhagic stroke and midline shifts.  More importantly, this data also includes people **without pathology** with high resolution scanning.  Many clinical protocols perform axial scanning with a high within-plane resolution (e.g.$0.5$mm x $0.5$mm) but lower out-of-plane resolution (e.g. $5$mm).  High resolution scans (out of plane resolution $\approx 0.5$mm) may not be collected or reconstructed as the lower resolution scans are typically those read by the clinician or radiologist for diagnosis and prognosis.  
+Many clinical protocols perform axial scanning with a high within-plane resolution (e.g.$0.5$mm x $0.5$mm) but lower out-of-plane resolution (e.g. $5$mm).  High resolution scans (out of plane resolution $\approx 0.5$mm) may not be collected or reconstructed as the lower resolution scans are typically those read by the clinician or radiologist for diagnosis and prognosis. Recently, a resource of a large number of CT scans were made avaiable, denoted as CQ500 [@cq500].  These scans include people with a number of pathologies, including hemorrhagic stroke and midline shifts. Fortunately, this data also includes people **without indicated pathology** with high resolution scanning.  
 
 The goal of this work is to create an anatomically unbiased, high-resolution CT template of the brain.  The first, and we believe the only, publicly-available CT template was released by @rorden_age-specific_2012.  This template was created with the specific purpose of creating a template with a similar age range as those with stroke, using 30 individuals with a mean age of 65 years old.  The associated toolbox released contained a high resolution (1x1x1mm$^3$) template, with the skull on.  Subsequent releases have included skull-stripped brain templates, but only in a lower (2x2x2mm$^3$) space (https://github.com/neurolabusc/Clinical).  Thus, we have a high-resolution template, but not of the brain only (and skull stripping the template performs marginally well), and a low-resolution template of the brain only.
 We have used these templates in previous analyses, but would like a brain template that was 1) constructed using an unbiased anatomical procedure, 2) uses more patients, 3) uses high-resolution scans to achieve a higher resolution, and 4) provide an image which dimensions are easily used in deep learning frameworks.
+
+Also, as the CQ500 data was released under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 (CC-NC-SA) International License, we can release the template under the same license.
 
 ## Methods
 
 All code, analysis, and reporting was done the R statistical programming language [@RCORE] and a number of packages from the R medical imaging package platform Neuroconductor [@neuroconductor].  
 ```{r}
-hres = readr::read_rds("data/high_resolution_scans.rds")
-both = readr::read_rds("data/both_resolution_scans.rds")
-reads = readr::read_csv("data/reads.csv")
+hres = readr::read_rds("high_resolution_scans.rds")
+both = readr::read_rds("both_resolution_scans.rds")
+reads = readr::read_csv("reads.csv")
 reads = reads %>% 
   mutate(id = gsub("-", "", name))
 rs = reads %>% 
@@ -84,9 +86,9 @@ $\bar{T}_{k + 1} = \bar{T}_{k} \times \left(-0.2 * \bar{G}_{k}\right)$.  Transfo
 For each iteration $k$, we can calculate a number of measures to determine if the template has converged compared to the previous iteration $k - 1$.  We calculated the Dice Similarity Coefficient (DSC) between the mask of iteration $k$ and $k-1$, where the mask for iteration $k$ is defined as $\bar{T}_{k} > 0$.  We also the Root Mean Squared Error (RMSE) of voxel intensities.  The RMSE can be calculated over a series of areas, either 1) the entire image, 2) over the non-zero voxels in iteration $k$, 3) in iteration $k-1$, or 4) the union (or intersection) of the 2 masks.  Calculation over the entire image gives an optimistic estimate as most of the image are zeroes, and the choice of either iteration $k$ or $k-1$ masks is arbitrary, so we calculated the RMSE over the union of the 2 masks.  
 
 ```{r}
-dnext = readr::read_rds("data/dice_ss.rds")
-dss = readr::read_rds("data/dice_average.rds")
-dmss = readr::read_rds("data/dice_ss_median.rds")
+dnext = readr::read_rds("dice_ss.rds")
+dss = readr::read_rds("dice_average.rds")
+dmss = readr::read_rds("dice_ss_median.rds")
 
 max_iter = 40
 dss = dss %>% 
@@ -150,9 +152,11 @@ grid.arrange(g, grmse, ncol = 2)
 ```
 
 ```{r read_in, message=FALSE}
-fname = file.path("data", sub("template_creation/", "", wmin$img))
-fname = sub("average", "average_512", fname)
-sd_fname = sub("average", "sd", fname)
+# fname = file.path("data", sub("template_creation/", "", wmin$img))
+# fname = sub("average", "average_512", fname)
+# sd_fname = sub("average", "sd", fname)
+fname = "template/template.nii.gz"
+sd_fname = "template/template_sd.nii.gz"
 img = readNifti(fname)
 rimg = range(img)
 rimg_non_zero = range(img[img != 0])
@@ -190,6 +194,7 @@ path  = file.path("index_files", "figure-latex",
                  c("template.png", "template_sd.png",
                    "template_hist.png"))
 ```
+
 See Figure\@ref(fig:segmentation)
 
 
