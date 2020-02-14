@@ -1,0 +1,202 @@
+index,name,ignore
+1,Unlabeled,TRUE
+2,aals,TRUE
+3,ahls,TRUE
+4,3rd Ventricle,FALSE
+5,calcarine,TRUE
+6,central,TRUE
+7,central_insular,TRUE
+8,cingulate,TRUE
+9,circular,TRUE
+10,collateral,TRUE
+11,4th Ventricle,FALSE
+12,first_transverse,TRUE
+13,Heschls,TRUE
+14,inferior_frontal,TRUE
+15,5th Ventricle,TRUE
+16,intraparietal,TRUE
+17,primary_inter,TRUE
+18,lateral_occipital,TRUE
+19,occ_temporal,TRUE
+20,olfactory,TRUE
+21,par_occipital,TRUE
+22,pals,TRUE
+23,Right Accumbens Area,FALSE
+24,phls,TRUE
+25,postcentral,TRUE
+26,precentral,TRUE
+27,subparietal,TRUE
+28,superior_frontal,TRUE
+29,superior_temporal,TRUE
+30,Left Accumbens Area,FALSE
+31,Right Amygdala,FALSE
+32,Left Amygdala,FALSE
+33,Right Amygdala Anterior,TRUE
+34,Left Amygdala Anterior,TRUE
+35,Brain Stem,FALSE
+36,Right Caudate,FALSE
+37,Left Caudate,FALSE
+38,Right Cerebellum Exterior,FALSE
+39,Left Cerebellum Exterior,FALSE
+40,Right Cerebellum White Matter,FALSE
+41,Left Cerebellum White Matter,FALSE
+42,Right Cerebral Exterior,TRUE
+43,Left Cerebral Exterior,TRUE
+44,Right Cerebral White Matter,FALSE
+45,Left Cerebral White Matter,FALSE
+46,CSF,FALSE
+47,Right Hippocampus,FALSE
+48,Left Hippocampus,FALSE
+49,Right Inf Lat Vent,FALSE
+50,Left Inf Lat Vent,FALSE
+51,Right Lateral Ventricle,FALSE
+52,Left Lateral Ventricle,FALSE
+53,Right Lesion,TRUE
+54,Left Lesion,TRUE
+55,Right Pallidum,FALSE
+56,Left Pallidum,FALSE
+57,Right Putamen,FALSE
+58,Left Putamen,FALSE
+59,Right Thalamus Proper,FALSE
+60,Left Thalamus Proper,FALSE
+61,Right Ventral DC,FALSE
+62,Left Ventral DC,FALSE
+63,Right vessel,TRUE
+64,Left vessel,TRUE
+65,Left Insula,TRUE
+66,Right Insula,TRUE
+67,Left Operculum,TRUE
+68,Right Operculum,TRUE
+69,Optic Chiasm,FALSE
+70,Basal Forebrain,TRUE
+71,Cerebellar Vermal Lobules I-V,FALSE
+72,Cerebellar Vermal Lobules VI-VII,FALSE
+73,Cerebellar Vermal Lobules VIII-X,FALSE
+74,Vitamin E Tablet,TRUE
+75,Left Basal Forebrain,FALSE
+76,Right Basal Forebrain,FALSE
+80,frontomarginal,TRUE
+81,inferior_rostral,TRUE
+82,inferior_temporal,TRUE
+83,lateral_orbital,TRUE
+84,superior_rostral,TRUE
+85,lateral,TRUE
+86,anterior_occipital,TRUE
+87,lhos,TRUE
+88,mhos,TRUE
+89,superior_vermal_sulcus,TRUE
+90,central_vermal_sulcus,TRUE
+91,inferior_vermal_sulcus,TRUE
+92,lateral_vermal_sulcus,TRUE
+93,thos,TRUE
+97,RED,TRUE
+98,YELLOW,TRUE
+99,CYAN,TRUE
+100,Right ACgG anterior cingulate gyrus,FALSE
+101,Left ACgG anterior cingulate gyrus,FALSE
+102,Right AIns anterior insula,FALSE
+103,Left AIns anterior insula,FALSE
+104,Right AOrG anterior orbital gyrus,FALSE
+105,Left AOrG anterior orbital gyrus,FALSE
+106,Right AnG angular gyrus,FALSE
+107,Left AnG angular gyrus,FALSE
+108,Right Calc calcarine cortex,FALSE
+109,Left Calc calcarine cortex,FALSE
+110,Right CgG cingulate gyrus,TRUE
+111,Left CgG cingulate gyrus,TRUE
+112,Right CO central operculum,FALSE
+113,Left CO central operculum,FALSE
+114,Right Cun cuneus,FALSE
+115,Left Cun cuneus,FALSE
+116,Right Ent entorhinal area,FALSE
+117,Left Ent entorhinal area,FALSE
+118,Right FO frontal operculum,FALSE
+119,Left FO frontal operculum,FALSE
+120,Right FRP frontal pole,FALSE
+121,Left FRP frontal pole,FALSE
+122,Right FuG fusiform gyrus,FALSE
+123,Left FuG fusiform gyrus,FALSE
+124,Right GRe gyrus rectus,FALSE
+125,Left GRe gyrus rectus,FALSE
+126,Right IFG inferior frontal gyrus,TRUE
+127,Left IFG inferior frontal gyrus,TRUE
+128,Right IOG inferior occipital gyrus,FALSE
+129,Left IOG inferior occipital gyrus,FALSE
+130,Right IOrG intermediate orbital gyrus,TRUE
+131,Left IOrG intermediate orbital gyrus,TRUE
+132,Right ITG inferior temporal gyrus,FALSE
+133,Left ITG inferior temporal gyrus,FALSE
+134,Right LiG lingual gyrus,FALSE
+135,Left LiG lingual gyrus,FALSE
+136,Right LOrG lateral orbital gyrus,FALSE
+137,Left LOrG lateral orbital gyrus,FALSE
+138,Right MCgG middle cingulate gyrus,FALSE
+139,Left MCgG middle cingulate gyrus,FALSE
+140,Right MFC medial frontal cortex,FALSE
+141,Left MFC medial frontal cortex,FALSE
+142,Right MFG middle frontal gyrus,FALSE
+143,Left MFG middle frontal gyrus,FALSE
+144,Right MOG middle occipital gyrus,FALSE
+145,Left MOG middle occipital gyrus,FALSE
+146,Right MOrG medial orbital gyrus,FALSE
+147,Left MOrG medial orbital gyrus,FALSE
+148,Right MPoG postcentral gyrus medial segment,FALSE
+149,Left MPoG postcentral gyrus medial segment,FALSE
+150,Right MPrG precentral gyrus medial segment,FALSE
+151,Left MPrG precentral gyrus medial segment,FALSE
+152,Right MSFG superior frontal gyrus medial segment,FALSE
+153,Left MSFG superior frontal gyrus medial segment,FALSE
+154,Right MTG middle temporal gyrus,FALSE
+155,Left MTG middle temporal gyrus,FALSE
+156,Right OCP occipital pole,FALSE
+157,Left OCP occipital pole,FALSE
+158,Right OFC orbitofrontal cortex,TRUE
+159,Left OFC orbitofrontal cortex,TRUE
+160,Right OFuG occipital fusiform gyrus,FALSE
+161,Left OFuG occipital fusiform gyrus,FALSE
+162,Right OpIFG opercular part of the inferior frontal gyrus,FALSE
+163,Left OpIFG opercular part of the inferior frontal gyrus,FALSE
+164,Right OrIFG orbital part of the inferior frontal gyrus,FALSE
+165,Left OrIFG orbital part of the inferior frontal gyrus,FALSE
+166,Right PCgG posterior cingulate gyrus,FALSE
+167,Left PCgG posterior cingulate gyrus,FALSE
+168,Right PCu precuneus,FALSE
+169,Left PCu precuneus,FALSE
+170,Right PHG parahippocampal gyrus,FALSE
+171,Left PHG parahippocampal gyrus,FALSE
+172,Right PIns posterior insula,FALSE
+173,Left PIns posterior insula,FALSE
+174,Right PO parietal operculum,FALSE
+175,Left PO parietal operculum,FALSE
+176,Right PoG postcentral gyrus,FALSE
+177,Left PoG postcentral gyrus,FALSE
+178,Right POrG posterior orbital gyrus,FALSE
+179,Left POrG posterior orbital gyrus,FALSE
+180,Right PP planum polare,FALSE
+181,Left PP planum polare,FALSE
+182,Right PrG precentral gyrus,FALSE
+183,Left PrG precentral gyrus,FALSE
+184,Right PT planum temporale,FALSE
+185,Left PT planum temporale,FALSE
+186,Right SCA subcallosal area,FALSE
+187,Left SCA subcallosal area,FALSE
+188,Right SCLC supracalcarine cortex,TRUE
+189,Left SCLC supracalcarine cortex,TRUE
+190,Right SFG superior frontal gyrus,FALSE
+191,Left SFG superior frontal gyrus,FALSE
+192,Right SMC supplementary motor cortex,FALSE
+193,Left SMC supplementary motor cortex,FALSE
+194,Right SMG supramarginal gyrus,FALSE
+195,Left SMG supramarginal gyrus,FALSE
+196,Right SOG superior occipital gyrus,FALSE
+197,Left SOG superior occipital gyrus,FALSE
+198,Right SPL superior parietal lobule,FALSE
+199,Left SPL superior parietal lobule,FALSE
+200,Right STG superior temporal gyrus,FALSE
+201,Left STG superior temporal gyrus,FALSE
+202,Right TMP temporal pole,FALSE
+203,Left TMP temporal pole,FALSE
+204,Right TrIFG triangular part of the inferior frontal gyrus,FALSE
+205,Left TrIFG triangular part of the inferior frontal gyrus,FALSE
+206,Right TTG transverse temporal gyrus,FALSE
+207,Left TTG transverse temporal gyrus,FALSE
