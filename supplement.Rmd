@@ -1,0 +1,69 @@
+---
+title: Supplemental Material
+bibliography: refs.bib
+output: 
+  bookdown::pdf_book:
+    keep_tex: true
+    toc: false
+    number_sections: yes
+    keep_md: true
+  html_document: 
+    toc: false
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+library(png)
+library(grid)
+library(dplyr)
+library(RNifti)
+library(neurobase)
+library(gridExtra)
+library(ggplot2)
+```
+
+In Supplemental Figure \@ref(fig:boundary), we show the voxels in the template that had values less than 5 Hounsfield units.  We removed these voxels from the final template as they are likely voxels from only a few subjects.  
+
+```{r boundary_create}
+pdfname = file.path("index_files", "figure-latex", "sd_image.pdf")
+if (!file.exists(pdfname)) {
+  fname = file.path("data", sub("template_creation/", "", wmin$img))
+  orig_img = readnii(fname)
+  xyz = xyz(array(orig_img > 10, dim = dim(orig_img)))
+  pdf(pdfname, height = 7, width = 7)
+  ortho2(orig_img, orig_img < 5 & orig_img > 0, xyz = xyz)
+  dev.off()
+}
+```
+
+```{r boundary, fig.cap="Boundary Issues with Low HU Values.  Here we present the average image with the mask of voxels that were lower than 5 HU in the template.  We excluded these values from the final template."}
+knitr::include_graphics("index_files/figure-latex/sd_image.pdf")
+```
+
+In Supplemental Figure \@ref(fig:median) we show the template image, but using the voxel-wise median rather than the mean.  We see fewer areas of high intensity, as the median is resistant to large outliers.  We do see some brighter areas towards the cortical surface, which may be a byproduct of partial voluming effects with the skull or truly denser areas.
+
+```{r median, fig.cap="Median Image.  We see fewer areas of high intensity, as the median is resistant to large outliers.  We do see some brighter areas towards the cortical surface, which may be a byproduct of partial voluming effects with the skull or truly denser areas."}
+# sd_fname = "template/template_sd.nii.gz"
+med_fname = "template/template_median.nii.gz"
+# sd_img = readNifti(sd_fname)
+med_img = readNifti(med_fname)
+
+mask = med_img > 0
+# sd_img = sd_img * mask
+inds = getEmptyImageDimensions(mask)
+# m = max(inds[[2]])
+# inds[[2]] = unique(c(inds[[2]], seq(m, m + 40)))
+med_img = med_img[inds[[1]], inds[[2]], inds[[3]]] 
+ortho2(med_img, text = "Median Template")
+```
+
+In Supplemental Table \@ref(tab:labs) Here we present a set of the labels for the structures in the structural segmentation of the template.
+
+```{r labs, results = "markup"}
+x = readr::read_csv("template/structure_labels.csv")
+x$ignore = NULL
+x[50:70,] %>% 
+  knitr::kable(caption = "Example Structure Labels.  Here we present a set of the labels for the structures in the structural segmentation of the template.") %>% 
+  kableExtra::kable_styling()
+```

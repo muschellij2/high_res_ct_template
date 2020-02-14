@@ -9,7 +9,7 @@ address:
     address: Johns Hopkins Bloomberg School of Public Health, Department of Biostatistics, 615 N Wolfe St, Baltimore, MD, 21205
 abstract: |
   Clinical imaging relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Many research applications aim to perform population-level analyses, which require images to be put in the same space, usually defined by a population average, also known as a template.  We present an open-source, publicly available, high-resolution CT template. With this template, we provide voxel-wise standard deviation and median images, a basic segmentation of the cerebrospinal fluid spaces, including the ventricles, and a coarse whole brain labeling. This template can be used for spatial normalization of CT scans and research applications, including deep learning. The template was created using an anatomically-unbiased template creation procedure, but is still limited by the population it was derived from, an open CT data set without demographic information. The template and derived images are available at https://github.com/muschellij2/high_res_ct_template. 
-journal: "NeuroImage"
+journal: "International Conference on Information Processing and Management of Uncertainty in Knowledge-Based Systems"
 date: "2020-02-14"
 bibliography: refs.bib
 output: 
@@ -68,7 +68,7 @@ For each iteration $k$, we can calculate a number of measures to determine if th
 
 To define convergence, we would like a high DSC between the masks and a low RMSE.  Ideally, the convergence criteria would set a DSC of $1$ and a RMSE less than $1$ Hounsfield Unit (HU), which would indicate the voxel intensity is changing less than $1$ HU on average.  As CT scans are measured in integers, this RMSE would likely be as good as possible.  We set a DSC cutoff of $0.95$ and chose the template with the lowest RMSE.  As this procedure is computationally expensive, we ran $40$ iterations, which was adequate for achieving stable results (Figure \@ref(fig:performance)).  
 
-Values of the final template that were lower than $5$ HU were boundary regions, outside the region of the brain and likely due to average of one or a small few of images, incongruent with the remainder of the template (Supplemental Figure \@ref(fig:boundary)).  We did not constrain the DSC and RMSE calculation excluding these regions, but excluded values less than $5$ HU from the final template.
+Values of the final template that were lower than $5$ HU were boundary regions, outside the region of the brain and likely due to average of one or a small few of images, incongruent with the remainder of the template (Supplemental Figure 1).  We did not constrain the DSC and RMSE calculation excluding these regions, but excluded values less than $5$ HU from the final template.
 
 After the template was created, we padded the coronal plane so that the template was 512x512x512.  The intention is that these dimensions allow it easier to create sub-sampled arrays that are cubes and multiples of 8, such as 256x256x256, 128x128x128, or 64x64x64 with isotropic resolution.  
 
@@ -127,65 +127,3 @@ This work has been been supported by the R01NS060910 and 5U01NS080824 grants fro
 References {#references .unnumbered}
 ==========
 
-
-# Supplemental Material
-
-In Supplemental Figure \@ref(fig:boundary), we show the voxels in the template that had values less than 5 Hounsfield units.  We removed these voxels from the final template as they are likely voxels from only a few subjects.  
-![(\#fig:boundary)Boundary Issues with Low HU Values.  Here we present the average image with the mask of voxels that were lower than 5 HU in the template.  We excluded these values from the final template.](index_files/figure-latex/boundary-1.pdf) 
-
-In Supplemental Figure \@ref(fig:median) we show the template image, but using the voxel-wise median rather than the mean.  We see fewer areas of high intensity, as the median is resistant to large outliers.  We do see some brighter areas towards the cortical surface, which may be a byproduct of partial voluming effects with the skull or truly denser areas.
-
-![(\#fig:median)Median Image.  We see fewer areas of high intensity, as the median is resistant to large outliers.  We do see some brighter areas towards the cortical surface, which may be a byproduct of partial voluming effects with the skull or truly denser areas.](index_files/figure-latex/median-1.pdf) 
-
-In Supplemental Table \@ref(tab:labs) Here we present a set of the labels for the structures in the structural segmentation of the template.
-
-\begin{table}[H]
-\centering
-\begin{tabular}{r|l}
-\hline
-index & name\\
-\hline
-50 & Left Inf Lat Vent\\
-\hline
-51 & Right Lateral Ventricle\\
-\hline
-52 & Left Lateral Ventricle\\
-\hline
-53 & Right Lesion\\
-\hline
-54 & Left Lesion\\
-\hline
-55 & Right Pallidum\\
-\hline
-56 & Left Pallidum\\
-\hline
-57 & Right Putamen\\
-\hline
-58 & Left Putamen\\
-\hline
-59 & Right Thalamus Proper\\
-\hline
-60 & Left Thalamus Proper\\
-\hline
-61 & Right Ventral DC\\
-\hline
-62 & Left Ventral DC\\
-\hline
-63 & Right vessel\\
-\hline
-64 & Left vessel\\
-\hline
-65 & Left Insula\\
-\hline
-66 & Right Insula\\
-\hline
-67 & Left Operculum\\
-\hline
-68 & Right Operculum\\
-\hline
-69 & Optic Chiasm\\
-\hline
-70 & Basal Forebrain\\
-\hline
-\end{tabular}
-\end{table}

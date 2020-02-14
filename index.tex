@@ -2,7 +2,7 @@
 %%% Begin My package additions %%%%%%%%%%%%%%%%%%%
 \usepackage[hyphens]{url}
 
-  \journal{NeuroImage} % Sets Journal name
+  \journal{International Conference on Information Processing and Management of Uncertainty in Knowledge-Based Systems} % Sets Journal name
 
 
 \usepackage{lineno} % add
@@ -72,20 +72,6 @@
   {\par}
 
 % Pandoc header
-\usepackage{booktabs}
-\usepackage{longtable}
-\usepackage{array}
-\usepackage{multirow}
-\usepackage{wrapfig}
-\usepackage{float}
-\usepackage{colortbl}
-\usepackage{pdflscape}
-\usepackage{tabu}
-\usepackage{threeparttable}
-\usepackage{threeparttablex}
-\usepackage[normalem]{ulem}
-\usepackage{makecell}
-\usepackage{xcolor}
 
 
 
@@ -154,7 +140,7 @@ For each iteration \(k\), we can calculate a number of measures to determine if 
 
 To define convergence, we would like a high DSC between the masks and a low RMSE. Ideally, the convergence criteria would set a DSC of \(1\) and a RMSE less than \(1\) Hounsfield Unit (HU), which would indicate the voxel intensity is changing less than \(1\) HU on average. As CT scans are measured in integers, this RMSE would likely be as good as possible. We set a DSC cutoff of \(0.95\) and chose the template with the lowest RMSE. As this procedure is computationally expensive, we ran \(40\) iterations, which was adequate for achieving stable results (Figure \ref{fig:performance}).
 
-Values of the final template that were lower than \(5\) HU were boundary regions, outside the region of the brain and likely due to average of one or a small few of images, incongruent with the remainder of the template (Supplemental Figure \ref{fig:boundary}). We did not constrain the DSC and RMSE calculation excluding these regions, but excluded values less than \(5\) HU from the final template.
+Values of the final template that were lower than \(5\) HU were boundary regions, outside the region of the brain and likely due to average of one or a small few of images, incongruent with the remainder of the template (Supplemental Figure 1). We did not constrain the DSC and RMSE calculation excluding these regions, but excluded values less than \(5\) HU from the final template.
 
 After the template was created, we padded the coronal plane so that the template was 512x512x512. The intention is that these dimensions allow it easier to create sub-sampled arrays that are cubes and multiples of 8, such as 256x256x256, 128x128x128, or 64x64x64 with isotropic resolution.
 
@@ -213,83 +199,6 @@ This work has been been supported by the R01NS060910 and 5U01NS080824 grants fro
 \hypertarget{references}{%
 \section*{References}\label{references}}
 \addcontentsline{toc}{section}{References}
-
-\hypertarget{supplemental-material}{%
-\section{Supplemental Material}\label{supplemental-material}}
-
-In Supplemental Figure \ref{fig:boundary}, we show the voxels in the template that had values less than 5 Hounsfield units. We removed these voxels from the final template as they are likely voxels from only a few subjects.
-
-\begin{verbatim}
-## pdf 
-##   2
-\end{verbatim}
-
-\begin{figure}
-\includegraphics[width=1\linewidth]{index_files/figure-latex/sd_image} \caption{Boundary Issues with Low HU Values.  Here we present the average image with the mask of voxels that were lower than 5 HU in the template.  We excluded these values from the final template.}\label{fig:boundary}
-\end{figure}
-
-In Supplemental Figure \ref{fig:median} we show the template image, but using the voxel-wise median rather than the mean. We see fewer areas of high intensity, as the median is resistant to large outliers. We do see some brighter areas towards the cortical surface, which may be a byproduct of partial voluming effects with the skull or truly denser areas.
-
-\begin{figure}
-\centering
-\includegraphics{index_files/figure-latex/median-1.pdf}
-\caption{\label{fig:median}Median Image. We see fewer areas of high intensity, as the median is resistant to large outliers. We do see some brighter areas towards the cortical surface, which may be a byproduct of partial voluming effects with the skull or truly denser areas.}
-\end{figure}
-
-In Supplemental Table \ref{tab:labs} Here we present a set of the labels for the structures in the structural segmentation of the template.
-
-\begin{table}
-
-\caption{\label{tab:labs}Example Structure Labels.  Here we present a set of the labels for the structures in the structural segmentation of the template.}
-\centering
-\begin{tabular}[t]{r|l}
-\hline
-index & name\\
-\hline
-50 & Left Inf Lat Vent\\
-\hline
-51 & Right Lateral Ventricle\\
-\hline
-52 & Left Lateral Ventricle\\
-\hline
-53 & Right Lesion\\
-\hline
-54 & Left Lesion\\
-\hline
-55 & Right Pallidum\\
-\hline
-56 & Left Pallidum\\
-\hline
-57 & Right Putamen\\
-\hline
-58 & Left Putamen\\
-\hline
-59 & Right Thalamus Proper\\
-\hline
-60 & Left Thalamus Proper\\
-\hline
-61 & Right Ventral DC\\
-\hline
-62 & Left Ventral DC\\
-\hline
-63 & Right vessel\\
-\hline
-64 & Left vessel\\
-\hline
-65 & Left Insula\\
-\hline
-66 & Right Insula\\
-\hline
-67 & Left Operculum\\
-\hline
-68 & Right Operculum\\
-\hline
-69 & Optic Chiasm\\
-\hline
-70 & Basal Forebrain\\
-\hline
-\end{tabular}
-\end{table}
 
 \hypertarget{refs}{}
 \begin{cslreferences}
