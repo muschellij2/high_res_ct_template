@@ -1,4 +1,4 @@
-all: index.pdf README.md index.html supplement.pdf
+all: index.pdf README.md index.html supplement.pdf index_with_supplement.pdf
 
 index.pdf: index.Rmd 
 	Rscript -e "rmarkdown::render('index.Rmd')"
@@ -11,6 +11,10 @@ supplement.html: supplement.Rmd
 
 supplement.pdf: supplement.Rmd 
 	Rscript -e "rmarkdown::render('supplement.Rmd')"
+
+index_with_supplement.pdf: index.pdf supplement.pdf
+	"/System/Library/Automator/Combine PDF Pages.action/Contents/Resources/join.py" -o index_with_supplement.pdf index.pdf supplement.pdf
+
 
 README.md: README.Rmd 
 	Rscript -e "rmarkdown::render('README.Rmd')"

@@ -1,5 +1,5 @@
 ---
-title: High Resolution, Unbiased CT Brain Template
+title: A Publicly Available, High Resolution, Unbiased CT Brain Template
 author:
   - name: John Muschelli
     email: jmusche1@jhu.edu
