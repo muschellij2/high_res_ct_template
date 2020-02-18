@@ -122,7 +122,7 @@ For all images, the head was skull-stripped so that only brain tissue and cerebr
 \hypertarget{template-creation}{%
 \subsubsection{Template Creation}\label{template-creation}}
 
-The process of template creation can be thought of as a gradient descent algorithm to estimate the true template image as inspired by the advanced normalization tools (ANTs) software and the R package ANTsR that implements the registration and transformation was used (https://github.com/ANTsX/ANTsR). The process is as follows:
+The process of template creation can be thought of as a gradient descent algorithm to estimate the true template image as inspired by the advanced normalization tools (ANTs) software and the R package ANTsR that implements the registration and transformation was used (https://github.com/ANTsX/ANTsR) (Brian B. Avants et al. 2011). The process is as follows:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -151,7 +151,7 @@ Though the template itself is the main goal of the work, many times researchers 
 
 We registered each brain MRI to the CT template using SyN and applied the transformation to the associated tissue segmentation and whole brain segmentation from that MRI template. Thus, we had 35 tissue segmentations of the CT template in template space, and the segmentations were combined using STAPLE (Warfield, Zou, and Wells 2004) via the \texttt{stapler} package (Muschelli 2019). The whole brain structures were combined using majority vote.
 
-Separating the brain from the cerebrospinal fluid areas (mainly ventricles) are of interest in many applications, such as Alzheimer's disease {[}Leon et al. (1989); braak1999neuropathology{]}. In addition, we segmented the template using Atropos (Avants et al. 2011), which used a k-means clustering approach with 2 clusters (CSF/tissue) to obtain a CSF mask. Additionally, we registered the MNI T1-weighted template to the CT Template using SyN, and applied the transofrmation used the ALVIN (Automatic Lateral Ventricle delIneatioN) mask of the ventricles (Kempton et al. 2011). We masked the CSF mask with this transformed ALVIN mask to get a mask of lateral ventricles as well.
+Separating the brain from the cerebrospinal fluid areas (mainly ventricles) are of interest in many applications, such as Alzheimer's disease {[}Leon et al. (1989); braak1999neuropathology{]}. In addition, we segmented the template using Atropos (Brian B Avants et al. 2011), which used a k-means clustering approach with 2 clusters (CSF/tissue) to obtain a CSF mask. Additionally, we registered the MNI T1-weighted template to the CT Template using SyN, and applied the transofrmation used the ALVIN (Automatic Lateral Ventricle delIneatioN) mask of the ventricles (Kempton et al. 2011). We masked the CSF mask with this transformed ALVIN mask to get a mask of lateral ventricles as well.
 
 \hypertarget{results}{%
 \subsection{Results}\label{results}}
@@ -204,6 +204,9 @@ This work has been been supported by the R01NS060910 and 5U01NS080824 grants fro
 \begin{cslreferences}
 \leavevmode\hypertarget{ref-avants_symmetric_2008}{}%
 Avants, B. B., C. L. Epstein, M. Grossman, and J. C. Gee. 2008. ``Symmetric Diffeomorphic Image Registration with Cross-Correlation: Evaluating Automated Labeling of Elderly and Neurodegenerative Brain.'' \emph{Medical Image Analysis}, Special issue on the third international workshop on biomedical image registration -- WBIR 2006, 12 (1): 26--41. \url{https://doi.org/10.1016/j.media.2007.06.004}.
+
+\leavevmode\hypertarget{ref-avants_reproducible_2011}{}%
+Avants, Brian B., Nicholas J. Tustison, Gang Song, Philip A. Cook, Arno Klein, and James C. Gee. 2011. ``A Reproducible Evaluation of ANTs Similarity Metric Performance in Brain Image Registration.'' \emph{NeuroImage} 54 (3): 2033--44. \url{https://doi.org/10.1016/j.neuroimage.2010.09.025}.
 
 \leavevmode\hypertarget{ref-atropos}{}%
 Avants, Brian B, Nicholas J Tustison, Jue Wu, Philip A Cook, and James C Gee. 2011. ``An Open Source Multivariate Framework for N-Tissue Segmentation with Evaluation on Public Data.'' \emph{Neuroinformatics} 9 (4): 381--400.

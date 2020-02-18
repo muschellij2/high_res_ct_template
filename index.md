@@ -10,7 +10,7 @@ address:
 abstract: |
   Clinical imaging relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Many research applications aim to perform population-level analyses, which require images to be put in the same space, usually defined by a population average, also known as a template.  We present an open-source, publicly available, high-resolution CT template. With this template, we provide voxel-wise standard deviation and median images, a basic segmentation of the cerebrospinal fluid spaces, including the ventricles, and a coarse whole brain labeling. This template can be used for spatial normalization of CT scans and research applications, including deep learning. The template was created using an anatomically-unbiased template creation procedure, but is still limited by the population it was derived from, an open CT data set without demographic information. The template and derived images are available at https://github.com/muschellij2/high_res_ct_template. 
 journal: "International Conference on Information Processing and Management of Uncertainty in Knowledge-Based Systems"
-date: "2020-02-14"
+date: "2020-02-18"
 bibliography: refs.bib
 output: 
   bookdown::pdf_book:
@@ -55,7 +55,7 @@ For all images, the head was skull-stripped so that only brain tissue and cerebr
 
 ### Template Creation
 
-The process of template creation can be thought of as a gradient descent algorithm to estimate the true template image as inspired by the advanced normalization tools (ANTs) software and the R package ANTsR that implements the registration and transformation was used (https://github.com/ANTsX/ANTsR).  The process is as follows:
+The process of template creation can be thought of as a gradient descent algorithm to estimate the true template image as inspired by the advanced normalization tools (ANTs) software and the R package ANTsR that implements the registration and transformation was used (https://github.com/ANTsX/ANTsR) [@avants_reproducible_2011].  The process is as follows:
 
 1. Let $I_{i}$ represent the image where $i$ represents subjects.  We registered all images to the template, denoted $\bar{T}_{k}$ where $k$ represents iteration, using an affine registration followed by symmetric normalization (SyN), a non-linear deformation/diffeomorphism, where the composed transformation is denoted as $G_{i, k}$ [@avants_symmetric_2008].  Let the transformed image be denoted as $T_{i, k}$.  In other words, $I_{i}\overset{G_{i,k}}{\rightarrow}T_{i, k}$.  The transformation $G_{i, k}$ is represented by a 4D warping image.  Let $T_{1}$ be the original template chosen above and $G_{i, 1}$ be the transformation for an image to the original template.
 2.  Calculate a the mean, median, and standard deviation images, where the mean image is $\bar{T}_{k} = \frac{1}{n} \sum\limits_{i = 1}^n T_{i, k}$, using a voxel-wise average.  
