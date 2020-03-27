@@ -110,7 +110,7 @@ All code, analysis, and reporting was done the R statistical programming languag
 \hypertarget{data}{%
 \subsubsection{Data}\label{data}}
 
-We defined a high-resolution patient scan as having a within-axial resolution of \(0.7\)x\(0.7\)mm or less, with full coverage of the brain. For example, if the cerebellum was not imaged, that image was discarded. All scans were non-contrast CT scans with a soft-tissue convolution kernel. As CT scans are generally well calibrated across sites and are measured in standard units of Hounsfield Units (HU), no intensity normalization was done. Intensities less than \(-1024\) HU (the value for air) and greater than \(3071\) HU were Winsorized to those values, as values outside of these are likely artifact or areas outside the field of view.
+We defined a high-resolution patient scan as having a within-axial resolution of \(0.7\)x\(0.7\)mm or less, with full coverage of the brain. For example, if the cerebellum was not imaged, that image was discarded. All scans were non-contrast CT scans with a soft-tissue convolution kernel. As CT scans are generally well calibrated across sites and are measured in standard units of Hounsfield Units (HU), no intensity normalization was done. Intensities less than \(-1024\) HU (the value for air) and greater than \(3071\) HU were Winsorized (Dixon and Yuen 1974) to those values, as values outside of these are likely artifact or areas outside the field of view.
 
 All data was converted from DICOM files to NIfTI (Neuroimaging Informatics Technology Initiative) using \texttt{dcm2niix} (Li et al. 2016) using the \texttt{dcm2niir} package (Muschelli 2018). This conversion corrects for any gantry tilt and enforces one fixed voxel size for the image, which is necessary if different areas of the image are provided at different resolutions, which is sparsely seen in clinical CT images.
 
@@ -130,13 +130,13 @@ The process of template creation can be thought of as a gradient descent algorit
 \item
   Let \(I_{i}\) represent the image where \(i\) represents subjects. We registered all images to the template, denoted \(\bar{T}_{k}\) where \(k\) represents iteration, using an affine registration followed by symmetric normalization (SyN), a non-linear deformation/diffeomorphism, where the composed transformation is denoted as \(G_{i, k}\) (Avants et al. 2008). Let the transformed image be denoted as \(T_{i, k}\). In other words, \(I_{i}\overset{G_{i,k}}{\rightarrow}T_{i, k}\). The transformation \(G_{i, k}\) is represented by a 4D warping image. Let \(T_{1}\) be the original template chosen above and \(G_{i, 1}\) be the transformation for an image to the original template.
 \item
-  Calculate a the mean, median, and standard deviation images, where the mean image is \(\bar{T}_{k} = \frac{1}{n} \sum\limits_{i = 1}^n T_{i, k}\), using a voxel-wise average.\\
+  Calculate the mean, median, and standard deviation images, where the mean image is \(\bar{T}_{k} = \frac{1}{n} \sum\limits_{i = 1}^n T_{i, k}\), using a voxel-wise average.\\
 \item
   Calculate the average warping transformation: \(\bar{G}_{k} = \frac{1}{n} \sum\limits_{i = 1}^n G_{i, k}\). A gradient descent step size of 0.2 was specified for SyN gradient descent, such that:
   \(\bar{T}_{k + 1} = \bar{T}_{k} \times \left(-0.2 * \bar{G}_{k}\right)\). The median and standard deviation are transformed accordingly.
 \end{enumerate}
 
-For each iteration \(k\), we can calculate a number of measures to determine if the template has converged compared to the previous iteration \(k - 1\). We calculated the Dice Similarity Coefficient (DSC) between the mask of iteration \(k\) and \(k-1\), where the mask for iteration \(k\) is defined as \(\bar{T}_{k} > 0\). The DSC measures if the overall shape is consistent across iterations. We also the root mean squared error (RMSE) of voxel intensities, e.g.~\(\frac{1}{V} \sum\left(\bar{T}_{k} - \bar{T}_{k-1}\right)^2\), where \(V\) is the number of voxels in the volume. The RMSE can be calculated over a series of volumes, either 1) the entire image, 2) over the non-zero voxels in iteration \(k\), 3) in iteration \(k-1\), or 4) the union (or intersection) of the 2 masks. Calculation over the entire image gives an optimistic estimate as most of the image are zeroes, and the choice of either iteration \(k\) or \(k-1\) masks is arbitrary, so we calculated the RMSE over the union of the 2 masks. The RMSE represents if the values of the image are close across iterations.
+For each iteration \(k\), we can calculate a number of measures to determine if the template has converged compared to the previous iteration \(k - 1\). We calculated the Dice Similarity Coefficient (DSC) (Dice 1945) between the mask of iteration \(k\) and \(k-1\), where the mask for iteration \(k\) is defined as \(\bar{T}_{k} > 0\). The DSC measures if the overall shape is consistent across iterations. We also the root mean squared error (RMSE) of voxel intensities, e.g.~\(\frac{1}{V} \sum\left(\bar{T}_{k} - \bar{T}_{k-1}\right)^2\), where \(V\) is the number of voxels in the volume. The RMSE can be calculated over a series of volumes, either 1) the entire image, 2) over the non-zero voxels in iteration \(k\), 3) in iteration \(k-1\), or 4) the union (or intersection) of the 2 masks. Calculation over the entire image gives an optimistic estimate as most of the image are zeroes, and the choice of either iteration \(k\) or \(k-1\) masks is arbitrary, so we calculated the RMSE over the union of the 2 masks. The RMSE represents if the values of the image are close across iterations.
 
 To define convergence, we would like a high DSC between the masks and a low RMSE. Ideally, the convergence criteria would set a DSC of \(1\) and a RMSE less than \(1\) Hounsfield Unit (HU), which would indicate the voxel intensity is changing less than \(1\) HU on average. As CT scans are measured in integers, this RMSE would likely be as good as possible. We set a DSC cutoff of \(0.95\) and chose the template with the lowest RMSE. As this procedure is computationally expensive, we ran \(40\) iterations, which was adequate for achieving stable results (Figure \ref{fig:performance}).
 
@@ -151,7 +151,7 @@ Though the template itself is the main goal of the work, many times researchers 
 
 We registered each brain MRI to the CT template using SyN and applied the transformation to the associated tissue segmentation and whole brain segmentation from that MRI template. Thus, we had 35 tissue segmentations of the CT template in template space, and the segmentations were combined using STAPLE (Warfield, Zou, and Wells 2004) via the \texttt{stapler} package (Muschelli 2019). The whole brain structures were combined using majority vote.
 
-Separating the brain from the cerebrospinal fluid areas (mainly ventricles) are of interest in many applications, such as Alzheimer's disease {[}Leon et al. (1989); braak1999neuropathology{]}. In addition, we segmented the template using Atropos (Brian B Avants et al. 2011), which used a k-means clustering approach with 2 clusters (CSF/tissue) to obtain a CSF mask. Additionally, we registered the MNI T1-weighted template to the CT Template using SyN, and applied the transofrmation used the ALVIN (Automatic Lateral Ventricle delIneatioN) mask of the ventricles (Kempton et al. 2011). We masked the CSF mask with this transformed ALVIN mask to get a mask of lateral ventricles as well.
+Separating the brain from the cerebrospinal fluid areas (mainly ventricles) are of interest in many applications, such as Alzheimer's disease (Leon et al. 1989; Braak et al. 1999). In addition, we segmented the template using Atropos (Brian B Avants et al. 2011), which used a k-means clustering approach with 2 clusters (CSF/tissue) to obtain a CSF mask. Additionally, we registered the MNI T1-weighted template to the CT Template using SyN, and applied the transformation used the ALVIN (Automatic Lateral Ventricle delIneatioN) mask of the ventricles (Kempton et al. 2011). We masked the CSF mask with this transformed ALVIN mask to get a mask of lateral ventricles as well.
 
 \hypertarget{results}{%
 \subsection{Results}\label{results}}
@@ -211,8 +211,17 @@ Avants, Brian B., Nicholas J. Tustison, Gang Song, Philip A. Cook, Arno Klein, a
 \leavevmode\hypertarget{ref-atropos}{}%
 Avants, Brian B, Nicholas J Tustison, Jue Wu, Philip A Cook, and James C Gee. 2011. ``An Open Source Multivariate Framework for N-Tissue Segmentation with Evaluation on Public Data.'' \emph{Neuroinformatics} 9 (4): 381--400.
 
+\leavevmode\hypertarget{ref-braak1999neuropathology}{}%
+Braak, Eva, Katherine Griffing, Kimihito Arai, Jürgen Bohl, Hansjürgen Bratzke, and Heiko Braak. 1999. ``Neuropathology of Alzheimer's Disease: What Is New Since A. Alzheimer?'' \emph{European Archives of Psychiatry and Clinical Neuroscience} 249 (3): S14--S22.
+
 \leavevmode\hypertarget{ref-cq500}{}%
 Chilamkurthy, Sasank, Rohit Ghosh, Swetha Tanamala, Mustafa Biviji, Norbert G Campeau, Vasantha Kumar Venugopal, Vidur Mahajan, Pooja Rao, and Prashant Warier. 2018. ``Deep Learning Algorithms for Detection of Critical Findings in Head CT Scans: A Retrospective Study.'' \emph{The Lancet} 392 (10162): 2388--96.
+
+\leavevmode\hypertarget{ref-dice_measures_1945}{}%
+Dice, Lee R. 1945. ``Measures of the Amount of Ecologic Association Between Species.'' \emph{Ecology} 26 (3): 297--302. \url{http://www.jstor.org/stable/1932409}.
+
+\leavevmode\hypertarget{ref-dixon1974trimming}{}%
+Dixon, Wilfrid J, and Kareb K Yuen. 1974. ``Trimming and Winsorization: A Review.'' \emph{Statistische Hefte} 15 (2-3): 157--70.
 
 \leavevmode\hypertarget{ref-jenkinson_fsl_2012}{}%
 Jenkinson, Mark, Christian F. Beckmann, Timothy E. J. Behrens, Mark W. Woolrich, and Stephen M. Smith. 2012. ``FSL.'' \emph{NeuroImage} 62 (2): 782--90. \url{https://doi.org/10.1016/j.neuroimage.2011.09.015}.
