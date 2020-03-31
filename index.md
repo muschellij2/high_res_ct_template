@@ -10,7 +10,7 @@ address:
 abstract: |
   Clinical imaging relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Many research applications aim to perform population-level analyses, which require images to be put in the same space, usually defined by a population average, also known as a template.  We present an open-source, publicly available, high-resolution CT template. With this template, we provide voxel-wise standard deviation and median images, a basic segmentation of the cerebrospinal fluid spaces, including the ventricles, and a coarse whole brain labeling. This template can be used for spatial normalization of CT scans and research applications, including deep learning. The template was created using an anatomically-unbiased template creation procedure, but is still limited by the population it was derived from, an open CT data set without demographic information. The template and derived images are available at https://github.com/muschellij2/high_res_ct_template. 
 journal: "International Conference on Information Processing and Management of Uncertainty in Knowledge-Based Systems"
-date: "2020-03-27"
+date: "2020-03-31"
 bibliography: refs.bib
 output: 
   bookdown::pdf_book:
