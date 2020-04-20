@@ -10,7 +10,7 @@ address:
 abstract: |
   Clinical imaging relies heavily on X-ray computed tomography (CT) scans for diagnosis and prognosis.  Many research applications aim to perform population-level analyses, which require images to be put in the same space, usually defined by a population average, also known as a template.  We present an open-source, publicly available, high-resolution CT template. With this template, we provide voxel-wise standard deviation and median images, a basic segmentation of the cerebrospinal fluid spaces, including the ventricles, and a coarse whole brain labeling. This template can be used for spatial normalization of CT scans and research applications, including deep learning. The template was created using an anatomically-unbiased template creation procedure, but is still limited by the population it was derived from, an open CT data set without demographic information. The template and derived images are available at https://github.com/muschellij2/high_res_ct_template. 
 journal: "International Conference on Information Processing and Management of Uncertainty in Knowledge-Based Systems"
-date: "2020-03-31"
+date: "2020-04-20"
 bibliography: refs.bib
 output: 
   bookdown::pdf_book:
@@ -36,13 +36,13 @@ Thus, the current CT templates available are a high-resolution template (1mm$^3$
 
 As the CQ500 data was released under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 (CC-NC-SA) International License, we can release the template under the same license.
 
-## Methods
+# Methods
 
 All code, analysis, and reporting was done the R statistical programming language [@RCORE] and a number of packages from the R medical imaging package platform Neuroconductor [@neuroconductor].  
 
 
 
-### Data
+## Data
 
 We defined a high-resolution patient scan as having a within-axial resolution of $0.7$x$0.7$mm or less, with full coverage of the brain.  For example, if the cerebellum was not imaged, that image was discarded.  All scans were non-contrast CT scans with a soft-tissue convolution kernel.  As CT scans are generally well calibrated across sites and are measured in standard units of Hounsfield Units (HU), no intensity normalization was done.  Intensities less than $-1024$ HU (the value for air) and greater than $3071$ HU were Winsorized [@dixon1974trimming] to those values, as values outside of these are likely artifact or areas outside the field of view.  
 
@@ -53,7 +53,7 @@ From the CQ500 data set, 222 subjects had no indication of pathology, of which 1
 For all images, the head was skull-stripped so that only brain tissue and cerebrospinal fluid (CSF) spaces were kept, using a previously validated method [@muschelli_validated_2015] using the brain extraction tool (BET) from FSL (FMRIB Software Library
 ) [@smith_fast_2002; @jenkinson_fsl_2012].  We chose an image (patient 100 from CQ500), for template creation.  This choice was based on a within-plane resolution close to $0.5$x$0.5$mm ($0.488$x$0.488$mm), an axial slice size of 512x512, and an out-of-plane resolution of $0.5$mm.  The image was resampled to $0.5$x$0.5$x$0.5$mm resolution so that the voxels are isotropic.  We would like the image to be square; we padded the image back to 512x512 after resampling, and the image had 336 coronal-plane slices. 
 
-### Template Creation
+## Template Creation
 
 The process of template creation can be thought of as a gradient descent algorithm to estimate the true template image as inspired by the advanced normalization tools (ANTs) software and the R package ANTsR that implements the registration and transformation was used (https://github.com/ANTsX/ANTsR) [@avants_reproducible_2011].  The process is as follows:
 
@@ -72,7 +72,7 @@ Values of the final template that were lower than $5$ HU were boundary regions, 
 
 After the template was created, we padded the coronal plane so that the template was 512x512x512.  The intention is that these dimensions allow it easier to create sub-sampled arrays that are cubes and multiples of 8, such as 256x256x256, 128x128x128, or 64x64x64 with isotropic resolution.  
 
-### Segmentation
+## Segmentation
 
 Though the template itself is the main goal of the work, many times researchers use or are interested in annotations/segmentations of the template space.  The contrast between gray matter and white matter in CT imaging is not as high as T1-weighted MRI.  Some areas, such as the cerebellum, corpus callosum, and basal ganglia can be delineated well.  Thus, segmentation methods based on intensity may not differentiate gray and white matter adequately.  We instead used a multi-atlas registration approach using previously-published set of 35 MRI atlases from @bennett2012miccai, which had whole brain segmentations, including tissue-class segmentations.  
 
@@ -81,7 +81,7 @@ We registered each brain MRI to the CT template using SyN and applied the transf
 Separating the brain from the cerebrospinal fluid areas (mainly ventricles) are of interest in many applications, such as Alzheimer's disease [@de1989alzheimer; @braak1999neuropathology].  In addition, we segmented the template using Atropos [@atropos], which used a k-means clustering approach with 2 clusters (CSF/tissue) to obtain a CSF mask.  Additionally, we registered the MNI T1-weighted template to the CT Template using SyN, and applied the transformation used the ALVIN (Automatic Lateral Ventricle delIneatioN) mask of the ventricles [@alvin].  We masked the CSF mask with this transformed ALVIN mask to get a mask of lateral ventricles as well. 
 
 
-## Results
+# Results
 
 
 
@@ -107,7 +107,7 @@ The template for this image can be seen in Figure \@ref(fig:template), along wit
 In Figure\@ref(fig:seg), we see the template again, with the tissue-class segmentation (Panel B), whole brain structural segmentation (Panel C), and Atropos lateral ventricle segmentation.  Overall, we see some differences between the segmentation of the CSF based on Atropos and the multi-atlas labeling approach.  We have provided a lookup table for each structure label with its corresponding value in the image. 
 
 
-## Discussion 
+# Discussion 
 
 We present a high-resolution, publicly-available CT template with associated segmentations and other annotations of the template. The data used was from a publicly-available dataset, the CQ500.  The main downside with the CQ500 data set is that no demographic or clinical information was released for each patient, save for indication for pathology.  Therefore, we cannot attest the general population of interest for this template.  Furthermore, we cannot fully assume these patients were disease-free as a lack of pathology only applies to the categories of interest in the CQ500 dataset (intracranial/subdural/subarachnoid/epidural hematoma, calvarial or other fractures, mass effect and midline shifts).   In future work, we hope to prepare age- and sex-specific templates for each population based on hospital scans and records, where we have demographic information and confirmation of lack of neuropathology. 
 
@@ -120,7 +120,7 @@ The resulting image dimensions was 512x512x512, with a resolution of 0.5x0.5x0.5
 CQ500 is Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.  Therefore, the template is released under the same license.  The images are located on https://github.com/muschellij2/high_res_ct_template and can be accessed at https://johnmuschelli.com/high_res_ct_template/template/.
 
 
-## Acknowledgments
+# Acknowledgments
 This work has been been supported by the R01NS060910 and 5U01NS080824 grants from the National Institute of Neurological Disorders and Stroke at the National Institutes of Health (NINDS/NIH). 
 
 
