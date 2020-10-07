@@ -14,7 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 library(magrittr)
 x = list.files(pattern = "nii.gz")
 y = c("lateral_ventricles" = "Lateral Ventricles", "seg" = "Tissue Segmentation", "structures" = "Brain Structures", "template_median" = "Voxel-wise Median", 
-"template_sd" = "Voxel-wise Standard Deviation", "Template_to_MNIcomptx" = "SyN Transform to MNI space", "template" = "Template Image")
+"template_sd" = "Voxel-wise Standard Deviation", "Template_to_MNIcomptx" = "SyN Transform to MNI space", 
+"template" = "Template Image", "template_with_skull" = "Template with Skull",
+"template_median_with_skull" = "Voxel-wise Median with Skull")
 y = data.frame(name = y, stub = names(y), stringsAsFactors = FALSE)
 df = data.frame(
   link = paste0("[", x, "](", x, ")"),
