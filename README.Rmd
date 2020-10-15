@@ -13,6 +13,13 @@ knitr::opts_chunk$set(
 
 # High Resolution CT Template
 
+
+<!-- badges: start -->
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+<!-- badges: end -->
+
+
 Please see the publication at https://doi.org/10.1007/978-3-030-50153-2_27 and cite this template using:
 
 Muschelli, John. "A Publicly Available, High Resolution, Unbiased CT Brain Template." International Conference on Information Processing and Management of Uncertainty in Knowledge-Based Systems. Springer, Cham, 2020.
@@ -27,12 +34,7 @@ Muschelli, John. "A Publicly Available, High Resolution, Unbiased CT Brain Templ
   year={2020},
   organization={Springer}
 }
-````
-
-<!-- badges: start -->
-[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-<!-- badges: end -->
+```
 
 The data used for this template was from the CQ500 dataset by qure.ai (http://headctstudy.qure.ai/dataset).  That data set is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/), and thus so is this template. 
 
