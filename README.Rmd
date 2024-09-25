@@ -42,7 +42,7 @@ The data used for this template was from the CQ500 dataset by qure.ai (http://he
 See the files in the [template folder](template/) or [here](https://johnmuschelli.com/high_res_ct_template/template).
 
 
-# Other CT Template Optiosn
+# Other CT Template Options
 
 - Paper: Rajashekar, D., Wilms, M., MacDonald, M.E. et al. High-resolution T2-FLAIR and non-contrast CT brain atlas of the elderly. Sci Data 7, 56 (2020). https://doi.org/10.1038/s41597-020-0379-9.  
     - Webpage: https://ucalgary.ca/labs/miplab/downloads?utm_source=miplab&utm_medium=redirect&utm_campaign=redirect, GitHub: https://github.com/deepthirajashekar/FLAIR-and-NCCT-atlas-for-elderly, Template Files: https://figshare.com/s/9a0ae1773fbf7f46347d.  FLAIR atlas: https://figshare.com/s/13926af9a272fe26eeb0, MNI transformations for atlas: https://figshare.com/s/ba3ff5285e7ce545a916

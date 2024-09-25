@@ -41,7 +41,7 @@ is this template.
 See the files in the [template folder](template/) or
 [here](https://johnmuschelli.com/high_res_ct_template/template).
 
-# Other CT Template Optiosn
+# Other CT Template Options
 
 - Paper: Rajashekar, D., Wilms, M., MacDonald, M.E. et
   al. High-resolution T2-FLAIR and non-contrast CT brain atlas of the

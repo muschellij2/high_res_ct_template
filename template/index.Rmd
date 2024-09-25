@@ -4,27 +4,69 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## Files
 
-
+All of these files other than the transform have a 0.5mm^3 resolution:
 ```{r, echo = FALSE, warning=FALSE, message = FALSE}
 library(magrittr)
+library(dplyr)
+library(kableExtra)
 x = list.files(pattern = "nii.gz")
-y = c("lateral_ventricles" = "Lateral Ventricles", "seg" = "Tissue Segmentation", "structures" = "Brain Structures", "template_median" = "Voxel-wise Median", 
-"template_sd" = "Voxel-wise Standard Deviation", "Template_to_MNIcomptx" = "SyN Transform to MNI space", 
-"template" = "Template Image", "template_with_skull" = "Template with Skull",
-"template_median_with_skull" = "Voxel-wise Median with Skull")
+y = c(
+  "lateral_ventricles" = "Lateral Ventricles",
+  "seg" = "Tissue Segmentation",
+  "structures" = "Brain Structures",
+  "template_median" = "Voxel-wise Median",
+  "template_sd" = "Voxel-wise Standard Deviation",
+  "Template_to_MNIcomptx" = "SyN Transform to MNI space",
+  "template" = "Template Image",
+  "template_with_skull" = "Template with Skull",
+  "template_median_with_skull" = "Voxel-wise Median with Skull"
+)
 y = data.frame(name = y, stub = names(y), stringsAsFactors = FALSE)
 df = data.frame(
-  link = paste0("[", x, "](", x, ")"),
+  file = x,
+  # link = paste0("[", x, "](", x, ")"),
+  # link = cell_spec(x, "html", link = x),
   stub = neurobase::nii.stub(x, bn = TRUE),
   stringsAsFactors = FALSE)
 df = merge(df, y)
 df$stub = NULL
 df %>% 
-  knitr::kable(escape = FALSE) %>% 
+  select(file, name) %>% 
+  knitr::kable() %>% 
+  column_spec(1, link = df$file) %>% 
   kableExtra::kable_styling()
+```
+
+
+# 1mm Resolution
+Here are the files after downsampling with FSL to 1mm:
+```{r}
+df = df %>% 
+  mutate(file_disk = paste0("1mm/", sub("[.]nii", "_1mm.nii", file)) )
+df %>% 
+  filter(file.exists(file)) %>% 
+  select(file, name) %>%   
+  knitr::kable() %>% 
+  column_spec(1, link = df$file_disk) %>% 
+  kableExtra::kable_styling()  
+```
+
+
+# 2mm Resolution
+Here are the files after downsampling with FSL to 2mm:
+
+```{r}
+df = df %>% 
+  mutate(file_disk = paste0("2mm/", sub("[.]nii", "_2mm.nii", file)) )
+df %>% 
+  filter(file.exists(file)) %>% 
+  select(file, name) %>%   
+  knitr::kable() %>% 
+  column_spec(1, link = df$file_disk) %>% 
+  kableExtra::kable_styling()  
 ```
